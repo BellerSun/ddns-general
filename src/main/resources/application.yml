@@ -1,0 +1,18 @@
+server:
+  port: 50001
+
+sunyc:
+  dns:
+    server:
+      type: TENCENT #服务器类型
+      param: '{"login_token":"221148,3e298c3548dc68a1f3516d84d15db6a6"}' #服务器所需参数
+  ddns:
+    domain:
+      name: 'sunasan.cn'  #主域名
+      subName: 'www'  #解析域名的前缀
+    record:
+      aliveTime: 1000000 #  上次查询的解析记录，保存1000秒，大概16.6分钟
+  scheduler:
+    cron: '0 0/5 * * * ? ' # 记录的轮询时间设置
+  system:
+    activate: false #系统默认启动与否。
