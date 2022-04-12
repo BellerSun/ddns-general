@@ -4,15 +4,15 @@ server:
 sunyc:
   dns:
     server:
-      type: ALIYUN #服务器类型
-      param: '{"ak":"","sk":""}' #服务器所需参数
+      type: TENCENT #服务器类型
+      param: '{"login_token":""}' #服务器所需参数
   ddns:
     domain:
-      name: 'springboot.top'  #主域名
+      name: 'sunasan.cn'  #主域名
       subName: 'www'  #解析域名的前缀
     record:
       aliveTime: 1000000 #  上次查询的解析记录，保存1000秒，大概16.6分钟
   scheduler:
-    cron: '0 0/1 * * * ? ' # 记录的轮询时间设置
+    cron: '0 0/5 * * * ? ' # 记录的轮询时间设置
   system:
     activate: false #系统默认启动与否。

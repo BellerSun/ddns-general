@@ -50,6 +50,18 @@
             <version>1.2.75</version>
         </dependency>
 
+
+        <!--阿里云dns解析使用-->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>tea-openapi</artifactId>
+            <version>0.0.19</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>alidns20150109</artifactId>
+            <version>2.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -67,6 +79,7 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>ddns-general</finalName>
     </build>
 
 </project>

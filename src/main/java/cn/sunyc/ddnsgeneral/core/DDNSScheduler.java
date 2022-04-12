@@ -9,6 +9,7 @@ import cn.sunyc.ddnsgeneral.enumeration.DNSServerType;
 import cn.sunyc.ddnsgeneral.enumeration.OperationType;
 import cn.sunyc.ddnsgeneral.utils.IpUtil;
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
  * @modified By：none
  * @version: 1.0.0
  */
+@Slf4j
 @Component
 public class DDNSScheduler implements ApplicationContextAware {
     @Resource
@@ -47,7 +49,7 @@ public class DDNSScheduler implements ApplicationContextAware {
 
     @PostConstruct()
     public void init() {
-        System.out.println("尝试启动定时调度~");
+        log.info("尝试启动定时调度~");
 
         Class<? extends IDNSServer> dnsServerTypeByName = DNSServerType.getDNSServerTypeByName(systemProperties.getDnsServerType());
         if (null == dnsServerTypeByName) {
@@ -62,19 +64,21 @@ public class DDNSScheduler implements ApplicationContextAware {
         } catch (Exception ignore) {
             throw new IllegalArgumentException("服务类型没有找到对应的bean,配置类型:" + dnsServerTypeByName + "，支持类型:" + DNSServerType.getValidNames());
         }
-        System.out.println("初始化dnsAPI服务...");
+        log.info("[DDNS_SCHEDULER] 初始化dnsAPI服务...");
         this.dnsServer.init(JSON.parseObject(systemProperties.getDnsServerParam()));
-        System.out.println("初始化dnsAPI服务完成！");
-        System.out.println("定时调度启动成功！");
+        log.info("[DDNS_SCHEDULER] 初始化dnsAPI服务完成！");
+        log.info("[DDNS_SCHEDULER] 定时调度启动成功！");
 
     }
 
     @Scheduled(cron = "#{systemProperties.schedulerCron}")
     public void doDDNS() {
+        log.info("[DDNS_SCHEDULER] start.");
         systemStatus.getOperationRecords().offer(new SystemOperationRecord(OperationType.START, "开始"));
         if (!systemProperties.isActivate()) {
             systemStatus.getOperationRecords().offer(new SystemOperationRecord(OperationType.INACTIVATE, "系统未激活"));
             systemStatus.getOperationRecords().offer(new SystemOperationRecord(OperationType.END, "结束"));
+            log.info("[DDNS_SCHEDULER] end. 系统未激活.");
             return;
         }
         try {
@@ -84,6 +88,7 @@ public class DDNSScheduler implements ApplicationContextAware {
 
             // 当查询结果与上次记录解析结果相同，并且上次结果在有效期内，就等待(是担心别人通过其他渠道修改了解析记录，可是我们这里却不刷新)。
             if (nowOutSideIp.equalsIgnoreCase(preRecordIp) && (System.currentTimeMillis() - preRecordQueryTime) < systemProperties.getDdnsRecordAliveTime()) {
+                log.info("[DDNS_SCHEDULER] in cache time. end.");
                 return;
             }
 
@@ -112,12 +117,14 @@ public class DDNSScheduler implements ApplicationContextAware {
                 resolutionRecord.setValue(nowOutSideIp);
                 dnsServer.updateResolutionRecord(resolutionRecord);
                 systemStatus.getOperationRecords().offer(new SystemOperationRecord(OperationType.UPDATE_RECORD, "fromIP:" + preRecordIp + "\ttoIP:" + nowOutSideIp));
+                log.info("[DDNS_SCHEDULER] UPDATE_RECORD. fromIP:" + preRecordIp + "\ttoIP:" + nowOutSideIp);
             }
         } catch (Exception e) {
             // 运行中发现异常，异常信息压入队列
             systemStatus.getOperationRecords().offer(new SystemOperationRecord(OperationType.ERROR, e.getMessage()));
         }
         systemStatus.getOperationRecords().offer(new SystemOperationRecord(OperationType.END, "结束"));
+        log.info("[DDNS_SCHEDULER] standard end.");
     }
 
 

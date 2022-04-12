@@ -1,5 +1,6 @@
 package cn.sunyc.ddnsgeneral;
 
+import cn.sunyc.ddnsgeneral.core.server.ALiYunDNSServer;
 import cn.sunyc.ddnsgeneral.core.server.IDNSServer;
 import cn.sunyc.ddnsgeneral.core.server.TencentDNSServer;
 import cn.sunyc.ddnsgeneral.domain.ResolutionRecord;
@@ -63,7 +64,7 @@ public class NoneContextText {
 
     @Test
     void testTencentServer() throws Exception {
-        String token = "221148,3e298c3548dc68a1f3516d84d15db6a6";
+        String token = "";
         String domainName = "sunasan.cn";
         String subDomainName = "www";
         String type = "A";
@@ -72,6 +73,48 @@ public class NoneContextText {
         IDNSServer idnsServer = new TencentDNSServer();
         JSONObject initializeParam = new JSONObject();
         initializeParam.put("login_token", token);
+        idnsServer.init(initializeParam);
+
+        List<ResolutionRecord> resolutionRecords = idnsServer.queryList(domainName);
+
+        List<ResolutionRecord> targetRecords = resolutionRecords.stream()
+                .filter(Objects::nonNull)
+                .filter(record -> domainName.equals(record.getDomain()))
+                .filter(record -> subDomainName.equals(record.getSubDomain()))
+                .filter(record -> type.equals(record.getRecordType()))
+                .collect(Collectors.toList());
+
+
+        if (targetRecords.size() > 1) {
+            throw new RuntimeException("您的输入条件查询出来了多条记录，俺不知道要修改哪一个了。");
+        } else if (targetRecords.size() < 1) {
+            throw new RuntimeException("您的输入条件没有查询到记录，俺不知道要修改哪一个了。");
+        }
+        ResolutionRecord resolutionRecord = targetRecords.get(0);
+        System.out.println("查询出来的结果：");
+        System.out.println(JSON.toJSONString(resolutionRecord));
+
+        resolutionRecord.setValue("188.188.188.188");
+        boolean result = idnsServer.updateResolutionRecord(resolutionRecord);
+        System.out.println("修改结果：");
+        System.out.println(result);
+    }
+
+    @Test
+    void testAliYunServer() throws Exception {
+        String ak = "";
+        String sk = "";
+        String endpoint ="alidns.cn-beijing.aliyuncs.com";
+        String domainName = "springboot.top";
+        String subDomainName = "www";
+        String type = "A";
+
+
+        IDNSServer idnsServer = new ALiYunDNSServer();
+        JSONObject initializeParam = new JSONObject();
+        initializeParam.put("endpoint", endpoint);
+        initializeParam.put("ak", ak);
+        initializeParam.put("sk", sk);
         idnsServer.init(initializeParam);
 
         List<ResolutionRecord> resolutionRecords = idnsServer.queryList(domainName);

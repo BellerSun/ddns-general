@@ -13,6 +13,6 @@ sunyc:
     record:
       aliveTime: 1000000 #  上次查询的解析记录，保存1000秒，大概16.6分钟
   scheduler:
-    cron: '0 0/1 * * * ? ' # 记录的轮询时间设置
+    cron: '0 0/5 * * * ? ' # 记录的轮询时间设置
   system:
     activate: false #系统默认启动与否。

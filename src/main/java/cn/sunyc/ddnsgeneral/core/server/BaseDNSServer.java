@@ -7,6 +7,8 @@ import org.springframework.util.CollectionUtils;
 import java.util.Collection;
 
 /**
+ * DNS服务器的基本类型。主要是定义了公用的初始化方法等
+ *
  * @author ：sun yu chao
  * @date ：Created in 2021/3/13 17:16
  * @description： desc

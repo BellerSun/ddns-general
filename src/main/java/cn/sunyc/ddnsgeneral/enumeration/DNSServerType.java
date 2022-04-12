@@ -1,5 +1,7 @@
 package cn.sunyc.ddnsgeneral.enumeration;
 
+import cn.sunyc.ddnsgeneral.core.server.ALiYunDNSServer;
+import cn.sunyc.ddnsgeneral.core.server.HuaWeiDNSServer;
 import cn.sunyc.ddnsgeneral.core.server.IDNSServer;
 import cn.sunyc.ddnsgeneral.core.server.TencentDNSServer;
 import lombok.AllArgsConstructor;
@@ -28,11 +30,11 @@ public enum DNSServerType {
     /**
      * 华为云
      */
-    HUAWEI("HUAWEI", null),
+    HUAWEI("HUAWEI", HuaWeiDNSServer.class),
     /**
      * 阿里云
      */
-    ALIBABA("ALIBABA", null),
+    ALIYUN("ALIYUN", ALiYunDNSServer.class),
     ;
     /**
      * 对应配置的名字
@@ -45,13 +47,14 @@ public enum DNSServerType {
 
     /**
      * 根据配置名称给出一个对应的解析器类型
+     *
      * @param name 配置名称
      * @return 解析器类型
      */
     public static Class<? extends IDNSServer> getDNSServerTypeByName(String name) {
         DNSServerType[] serverTypes = values();
         for (DNSServerType serverType : serverTypes) {
-            if (serverType.name.equalsIgnoreCase(name)){
+            if (serverType.name.equalsIgnoreCase(name)) {
                 return serverType.dnsServerClass;
             }
         }
@@ -60,9 +63,10 @@ public enum DNSServerType {
 
     /**
      * 获取所有支持类型的名称
+     *
      * @return 支持类型的名称
      */
-    public static List<String> getValidNames(){
-       return Arrays.stream(values()).map(DNSServerType::getName).collect(Collectors.toList());
+    public static List<String> getValidNames() {
+        return Arrays.stream(values()).map(DNSServerType::getName).collect(Collectors.toList());
     }
 }
