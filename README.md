@@ -7,14 +7,16 @@
 * dns服务器类型
  
     * ${sunyc.dns.server.type}
+        * TENCENT：腾讯云
+        * ALIYUN：阿里云
 
 * dns服务器必须参数,json格式字符串。
 
     * ${sunyc.dns.server.param}
             
         * 腾讯云：login_token 登陆令牌，在腾讯云官网 [token设置页][tencent_token]生成login_token
-        * 华为云：等待支持... 
-        * 阿里云：等待支持...
+        * 阿里云：ak访问id，sk访问密匙，在阿里云个人中心 [用户信息管理页][aliyun_token]生成ak、sk
+        * 华为云：等待支持...
 
 * 动态解析的主域名【baidu.com】
  
@@ -46,3 +48,4 @@
 
 
 [tencent_token]: https://console.dnspod.cn/account/token
+[aliyun_token]: https://usercenter.console.aliyun.com/?spm=api-workbench.API%20Explorer.0.0.113b1e0fG0CkQG#/manage/ak
