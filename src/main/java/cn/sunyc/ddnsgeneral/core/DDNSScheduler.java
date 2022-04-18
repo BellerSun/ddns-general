@@ -2,7 +2,7 @@ package cn.sunyc.ddnsgeneral.core;
 
 import cn.sunyc.ddnsgeneral.config.SystemProperties;
 import cn.sunyc.ddnsgeneral.core.server.IDNSServer;
-import cn.sunyc.ddnsgeneral.domain.ResolutionRecord;
+import cn.sunyc.ddnsgeneral.domain.resolution.BaseResolutionRecord;
 import cn.sunyc.ddnsgeneral.domain.SystemOperationRecord;
 import cn.sunyc.ddnsgeneral.domain.SystemStatus;
 import cn.sunyc.ddnsgeneral.enumeration.DNSServerType;
@@ -33,34 +33,31 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class DDNSScheduler implements ApplicationContextAware {
+public class DDNSScheduler<T extends BaseResolutionRecord> implements ApplicationContextAware {
     @Resource
     private SystemStatus systemStatus;
     @Resource
     private SystemProperties systemProperties;
 
     private ApplicationContext applicationContext;
-    private IDNSServer dnsServer;
+    private IDNSServer<T> dnsServer;
 
 
     private String preRecordIp = "127.0.0.1";
     private long preRecordQueryTime = Long.MIN_VALUE;
 
-
     @PostConstruct()
+    @SuppressWarnings("unchecked")
     public void init() {
         log.info("尝试启动定时调度~");
 
-        Class<? extends IDNSServer> dnsServerTypeByName = DNSServerType.getDNSServerTypeByName(systemProperties.getDnsServerType());
+        Class<? extends IDNSServer<T>> dnsServerTypeByName = (Class<? extends IDNSServer<T>>) DNSServerType.getDNSServerTypeByName(systemProperties.getDnsServerType());
         if (null == dnsServerTypeByName) {
             throw new IllegalArgumentException("服务类型配置错误。key: sunyc.dns.server.type,支持类型:" + DNSServerType.getValidNames());
         }
 
         try {
             this.dnsServer = applicationContext.getBean(dnsServerTypeByName);
-            if (null == this.dnsServer) {
-                throw new IllegalArgumentException("服务类型没有找到对应的bean,配置类型:" + dnsServerTypeByName + "，支持类型:" + DNSServerType.getValidNames());
-            }
         } catch (Exception ignore) {
             throw new IllegalArgumentException("服务类型没有找到对应的bean,配置类型:" + dnsServerTypeByName + "，支持类型:" + DNSServerType.getValidNames());
         }
@@ -74,17 +71,17 @@ public class DDNSScheduler implements ApplicationContextAware {
     @Scheduled(cron = "#{systemProperties.schedulerCron}")
     public void doDDNS() {
         log.info("[DDNS_SCHEDULER] start.");
-        systemStatus.getOperationRecords().offer(new SystemOperationRecord(OperationType.START, "开始"));
+        systemStatus.getOperationRecords().add(new SystemOperationRecord(OperationType.START, "开始"));
         if (!systemProperties.isActivate()) {
-            systemStatus.getOperationRecords().offer(new SystemOperationRecord(OperationType.INACTIVATE, "系统未激活"));
-            systemStatus.getOperationRecords().offer(new SystemOperationRecord(OperationType.END, "结束"));
+            systemStatus.getOperationRecords().add(new SystemOperationRecord(OperationType.INACTIVATE, "系统未激活"));
+            systemStatus.getOperationRecords().add(new SystemOperationRecord(OperationType.END, "结束"));
             log.info("[DDNS_SCHEDULER] end. 系统未激活.");
             return;
         }
         try {
             // 查询当前外网ip
             String nowOutSideIp = IpUtil.getOutSideIp();
-            systemStatus.getOperationRecords().offer(new SystemOperationRecord(OperationType.QUERY_IP, nowOutSideIp));
+            systemStatus.getOperationRecords().add(new SystemOperationRecord(OperationType.QUERY_IP, nowOutSideIp));
 
             // 当查询结果与上次记录解析结果相同，并且上次结果在有效期内，就等待(是担心别人通过其他渠道修改了解析记录，可是我们这里却不刷新)。
             if (nowOutSideIp.equalsIgnoreCase(preRecordIp) && (System.currentTimeMillis() - preRecordQueryTime) < systemProperties.getDdnsRecordAliveTime()) {
@@ -93,9 +90,9 @@ public class DDNSScheduler implements ApplicationContextAware {
             }
 
             // 查询域名解析记录
-            List<ResolutionRecord> resolutionRecords = dnsServer.queryList(systemProperties.getDdnsDomainName());
-            systemStatus.getOperationRecords().offer(new SystemOperationRecord(OperationType.QUERY_RECORD, JSON.toJSONString(resolutionRecords)));
-            List<ResolutionRecord> targetRecords = resolutionRecords.stream()
+            List<T> baseResolutionRecords = dnsServer.queryList(systemProperties.getDdnsDomainName());
+            systemStatus.getOperationRecords().add(new SystemOperationRecord(OperationType.QUERY_RECORD, JSON.toJSONString(baseResolutionRecords)));
+            List<T> targetRecords = baseResolutionRecords.stream()
                     .filter(Objects::nonNull)
                     .filter(record -> systemProperties.getDdnsDomainName().equals(record.getDomain()))
                     .filter(record -> systemProperties.getDdnsDomainSubName().equals(record.getSubDomain()))
@@ -107,23 +104,24 @@ public class DDNSScheduler implements ApplicationContextAware {
                 throw new RuntimeException("您的输入条件没有查询到记录，俺不知道要修改哪一个了。");
             }
             //  记录查询成功，刷新查询结果，和查询时间
-            ResolutionRecord resolutionRecord = targetRecords.get(0);
-            this.preRecordIp = resolutionRecord.getValue();
+
+            T baseResolutionRecord = targetRecords.get(0);
+            this.preRecordIp = baseResolutionRecord.getValue();
             this.preRecordQueryTime = System.currentTimeMillis();
 
             //  如果发现不相等，就修改解析记录
             if (!nowOutSideIp.equalsIgnoreCase(preRecordIp)) {
                 // 这里发现不相等，不会刷新上次查询时间、结果。因为正好下次循环就重新查一下，这里修改成功了没。
-                resolutionRecord.setValue(nowOutSideIp);
-                dnsServer.updateResolutionRecord(resolutionRecord);
-                systemStatus.getOperationRecords().offer(new SystemOperationRecord(OperationType.UPDATE_RECORD, "fromIP:" + preRecordIp + "\ttoIP:" + nowOutSideIp));
+                baseResolutionRecord.setValue(nowOutSideIp);
+                dnsServer.updateResolutionRecord(targetRecords.get(0));
+                systemStatus.getOperationRecords().add(new SystemOperationRecord(OperationType.UPDATE_RECORD, "fromIP:" + preRecordIp + "\ttoIP:" + nowOutSideIp));
                 log.info("[DDNS_SCHEDULER] UPDATE_RECORD. fromIP:" + preRecordIp + "\ttoIP:" + nowOutSideIp);
             }
         } catch (Exception e) {
             // 运行中发现异常，异常信息压入队列
-            systemStatus.getOperationRecords().offer(new SystemOperationRecord(OperationType.ERROR, e.getMessage()));
+            systemStatus.getOperationRecords().add(new SystemOperationRecord(OperationType.ERROR, e.getMessage()));
         }
-        systemStatus.getOperationRecords().offer(new SystemOperationRecord(OperationType.END, "结束"));
+        systemStatus.getOperationRecords().add(new SystemOperationRecord(OperationType.END, "结束"));
         log.info("[DDNS_SCHEDULER] standard end.");
     }
 

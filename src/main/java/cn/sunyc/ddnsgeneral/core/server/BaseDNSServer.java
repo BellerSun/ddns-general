@@ -1,5 +1,6 @@
 package cn.sunyc.ddnsgeneral.core.server;
 
+import cn.sunyc.ddnsgeneral.domain.resolution.BaseResolutionRecord;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import org.springframework.util.CollectionUtils;
@@ -15,7 +16,7 @@ import java.util.Collection;
  * @modified By：none
  * @version: 1.0.0
  */
-public abstract class BaseDNSServer implements IDNSServer {
+public abstract class BaseDNSServer<T extends BaseResolutionRecord> implements IDNSServer<T> {
     /**
      * 初始化参数
      */

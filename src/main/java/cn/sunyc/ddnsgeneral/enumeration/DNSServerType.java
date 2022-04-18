@@ -4,6 +4,7 @@ import cn.sunyc.ddnsgeneral.core.server.ALiYunDNSServer;
 import cn.sunyc.ddnsgeneral.core.server.HuaWeiDNSServer;
 import cn.sunyc.ddnsgeneral.core.server.IDNSServer;
 import cn.sunyc.ddnsgeneral.core.server.TencentDNSServer;
+import cn.sunyc.ddnsgeneral.domain.resolution.BaseResolutionRecord;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -43,7 +44,7 @@ public enum DNSServerType {
     /**
      * 对应的解析器
      */
-    private final Class<? extends IDNSServer> dnsServerClass;
+    private final Class<? extends IDNSServer<? extends BaseResolutionRecord>> dnsServerClass;
 
     /**
      * 根据配置名称给出一个对应的解析器类型
@@ -51,7 +52,7 @@ public enum DNSServerType {
      * @param name 配置名称
      * @return 解析器类型
      */
-    public static Class<? extends IDNSServer> getDNSServerTypeByName(String name) {
+    public static Class<? extends IDNSServer<? extends BaseResolutionRecord>> getDNSServerTypeByName(String name) {
         DNSServerType[] serverTypes = values();
         for (DNSServerType serverType : serverTypes) {
             if (serverType.name.equalsIgnoreCase(name)) {

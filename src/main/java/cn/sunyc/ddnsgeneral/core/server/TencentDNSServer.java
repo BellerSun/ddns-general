@@ -1,6 +1,6 @@
 package cn.sunyc.ddnsgeneral.core.server;
 
-import cn.sunyc.ddnsgeneral.domain.ResolutionRecord;
+import cn.sunyc.ddnsgeneral.domain.resolution.BaseResolutionRecord;
 import cn.sunyc.ddnsgeneral.utils.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class TencentDNSServer extends BaseDNSServer {
+public class TencentDNSServer extends BaseDNSServer<BaseResolutionRecord> {
     private static final String API_BASE_URL = "https://dnsapi.cn/";
 
     private static String login_token;
@@ -33,7 +33,7 @@ public class TencentDNSServer extends BaseDNSServer {
     }
 
     @Override
-    public List<ResolutionRecord> queryList(String domainName) throws Exception {
+    public List<BaseResolutionRecord> queryList(String domainName) throws Exception {
         HashMap<String, String> param = getDefaultRequestParams();
 
         param.put("domain", domainName);
@@ -47,10 +47,10 @@ public class TencentDNSServer extends BaseDNSServer {
         }
         List<JSONObject> records = commonResp.getRecords();
 
-        List<ResolutionRecord> resolutionRecords = records.stream()
+        List<BaseResolutionRecord> baseResolutionRecords = records.stream()
                 .filter(Objects::nonNull)
                 .map(recordObj -> {
-                    ResolutionRecord resolutionRecord = new ResolutionRecord();
+                    BaseResolutionRecord resolutionRecord = new BaseResolutionRecord();
                     resolutionRecord.setRecordId(recordObj.getString("id"));
                     resolutionRecord.setDomain(domainName);
                     resolutionRecord.setMx(recordObj.getInteger("mx"));
@@ -60,12 +60,12 @@ public class TencentDNSServer extends BaseDNSServer {
                     resolutionRecord.setSubDomain(recordObj.getString("name"));
                     return resolutionRecord;
                 }).collect(Collectors.toList());
-        log.info("[TencentDNSServer] resolutionRecords:{}", JSON.toJSONString(resolutionRecords));
-        return resolutionRecords;
+        log.info("[TencentDNSServer] resolutionRecords:{}", JSON.toJSONString(baseResolutionRecords));
+        return baseResolutionRecords;
     }
 
     @Override
-    public boolean updateResolutionRecord(ResolutionRecord resolutionRecord) throws Exception {
+    public boolean updateResolutionRecord(BaseResolutionRecord resolutionRecord) throws Exception {
         HashMap<String, String> param = getDefaultRequestParams();
 
         param.put("record_id", resolutionRecord.getRecordId());
@@ -76,7 +76,9 @@ public class TencentDNSServer extends BaseDNSServer {
         param.put("value", resolutionRecord.getValue());
         param.put("mx", String.valueOf(resolutionRecord.getMx()));
 
+        log.info("[TencentDNSServer] update request:{}", JSON.toJSONString(param));
         String response = HttpUtil.post(API_BASE_URL + "Record.Modify", param);
+        log.info("[TencentDNSServer] update response:{}", JSON.toJSONString(response));
         TencentCommonResp commonResp = JSON.parseObject(response, TencentCommonResp.class);
         return commonResp.isSuccess();
     }

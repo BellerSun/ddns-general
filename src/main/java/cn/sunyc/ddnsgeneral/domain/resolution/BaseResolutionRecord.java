@@ -1,4 +1,4 @@
-package cn.sunyc.ddnsgeneral.domain;
+package cn.sunyc.ddnsgeneral.domain.resolution;
 
 import lombok.Data;
 
@@ -12,7 +12,7 @@ import lombok.Data;
  * @version: 1.0.0
  */
 @Data
-public class ResolutionRecord {
+public class BaseResolutionRecord {
     /**
      * 记录的唯一id
      */
@@ -38,7 +38,7 @@ public class ResolutionRecord {
      */
     private Integer mx;
     /**
-     * 记录的唯一id
+     * 记录的值
      */
     private String value;
 

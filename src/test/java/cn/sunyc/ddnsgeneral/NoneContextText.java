@@ -1,9 +1,11 @@
 package cn.sunyc.ddnsgeneral;
 
 import cn.sunyc.ddnsgeneral.core.server.ALiYunDNSServer;
+import cn.sunyc.ddnsgeneral.core.server.HuaWeiDNSServer;
 import cn.sunyc.ddnsgeneral.core.server.IDNSServer;
 import cn.sunyc.ddnsgeneral.core.server.TencentDNSServer;
-import cn.sunyc.ddnsgeneral.domain.ResolutionRecord;
+import cn.sunyc.ddnsgeneral.domain.resolution.BaseResolutionRecord;
+import cn.sunyc.ddnsgeneral.domain.resolution.HuaWeiResolutionRecord;
 import cn.sunyc.ddnsgeneral.utils.HttpUtil;
 import cn.sunyc.ddnsgeneral.utils.IpUtil;
 import com.alibaba.fastjson.JSON;
@@ -70,14 +72,14 @@ public class NoneContextText {
         String type = "A";
 
 
-        IDNSServer idnsServer = new TencentDNSServer();
+        IDNSServer<BaseResolutionRecord> idnsServer = new TencentDNSServer();
         JSONObject initializeParam = new JSONObject();
         initializeParam.put("login_token", token);
         idnsServer.init(initializeParam);
 
-        List<ResolutionRecord> resolutionRecords = idnsServer.queryList(domainName);
+        List<BaseResolutionRecord> baseResolutionRecords = idnsServer.queryList(domainName);
 
-        List<ResolutionRecord> targetRecords = resolutionRecords.stream()
+        List<BaseResolutionRecord> targetRecords = baseResolutionRecords.stream()
                 .filter(Objects::nonNull)
                 .filter(record -> domainName.equals(record.getDomain()))
                 .filter(record -> subDomainName.equals(record.getSubDomain()))
@@ -90,12 +92,12 @@ public class NoneContextText {
         } else if (targetRecords.size() < 1) {
             throw new RuntimeException("您的输入条件没有查询到记录，俺不知道要修改哪一个了。");
         }
-        ResolutionRecord resolutionRecord = targetRecords.get(0);
+        BaseResolutionRecord baseResolutionRecord = targetRecords.get(0);
         System.out.println("查询出来的结果：");
-        System.out.println(JSON.toJSONString(resolutionRecord));
+        System.out.println(JSON.toJSONString(baseResolutionRecord));
 
-        resolutionRecord.setValue("188.188.188.188");
-        boolean result = idnsServer.updateResolutionRecord(resolutionRecord);
+        baseResolutionRecord.setValue("188.188.188.188");
+        boolean result = idnsServer.updateResolutionRecord(baseResolutionRecord);
         System.out.println("修改结果：");
         System.out.println(result);
     }
@@ -110,16 +112,16 @@ public class NoneContextText {
         String type = "A";
 
 
-        IDNSServer idnsServer = new ALiYunDNSServer();
+        IDNSServer<BaseResolutionRecord> idnsServer = new ALiYunDNSServer();
         JSONObject initializeParam = new JSONObject();
         initializeParam.put("endpoint", endpoint);
         initializeParam.put("ak", ak);
         initializeParam.put("sk", sk);
         idnsServer.init(initializeParam);
 
-        List<ResolutionRecord> resolutionRecords = idnsServer.queryList(domainName);
+        List<BaseResolutionRecord> baseResolutionRecords = idnsServer.queryList(domainName);
 
-        List<ResolutionRecord> targetRecords = resolutionRecords.stream()
+        List<BaseResolutionRecord> targetRecords = baseResolutionRecords.stream()
                 .filter(Objects::nonNull)
                 .filter(record -> domainName.equals(record.getDomain()))
                 .filter(record -> subDomainName.equals(record.getSubDomain()))
@@ -132,12 +134,52 @@ public class NoneContextText {
         } else if (targetRecords.size() < 1) {
             throw new RuntimeException("您的输入条件没有查询到记录，俺不知道要修改哪一个了。");
         }
-        ResolutionRecord resolutionRecord = targetRecords.get(0);
+        BaseResolutionRecord baseResolutionRecord = targetRecords.get(0);
         System.out.println("查询出来的结果：");
-        System.out.println(JSON.toJSONString(resolutionRecord));
+        System.out.println(JSON.toJSONString(baseResolutionRecord));
 
-        resolutionRecord.setValue("188.188.188.188");
-        boolean result = idnsServer.updateResolutionRecord(resolutionRecord);
+        baseResolutionRecord.setValue("188.188.188.188");
+        boolean result = idnsServer.updateResolutionRecord(baseResolutionRecord);
+        System.out.println("修改结果：");
+        System.out.println(result);
+    }
+
+
+    @Test
+    void testHuaWeiServer() throws Exception {
+        String ak = "";
+        String sk = "";
+        String domainName = "hadoop.net.cn";
+        String subDomainName = "www";
+        String type = "A";
+
+        IDNSServer<HuaWeiResolutionRecord> idnsServer = new HuaWeiDNSServer();
+        JSONObject initializeParam = new JSONObject();
+        initializeParam.put("ak", ak);
+        initializeParam.put("sk", sk);
+        idnsServer.init(initializeParam);
+
+        List<HuaWeiResolutionRecord> baseResolutionRecords = idnsServer.queryList(domainName);
+
+        List<HuaWeiResolutionRecord> targetRecords = baseResolutionRecords.stream()
+                .filter(Objects::nonNull)
+                .filter(record -> domainName.equals(record.getDomain()))
+                .filter(record -> subDomainName.equals(record.getSubDomain()))
+                .filter(record -> type.equals(record.getRecordType()))
+                .collect(Collectors.toList());
+
+
+        if (targetRecords.size() > 1) {
+            throw new RuntimeException("您的输入条件查询出来了多条记录，俺不知道要修改哪一个了。");
+        } else if (targetRecords.size() < 1) {
+            throw new RuntimeException("您的输入条件没有查询到记录，俺不知道要修改哪一个了。");
+        }
+        HuaWeiResolutionRecord baseResolutionRecord = targetRecords.get(0);
+        System.out.println("查询出来的结果：");
+        System.out.println(JSON.toJSONString(baseResolutionRecord));
+
+        baseResolutionRecord.setValue("188.188.188.188");
+        boolean result = idnsServer.updateResolutionRecord(baseResolutionRecord);
         System.out.println("修改结果：");
         System.out.println(result);
     }

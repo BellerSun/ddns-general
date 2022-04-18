@@ -1,6 +1,6 @@
 package cn.sunyc.ddnsgeneral.core.server;
 
-import cn.sunyc.ddnsgeneral.domain.ResolutionRecord;
+import cn.sunyc.ddnsgeneral.domain.resolution.BaseResolutionRecord;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
  * @modified By：none
  * @version: 1.0.0
  */
-public interface IDNSServer {
+public interface IDNSServer<T extends BaseResolutionRecord> {
     /**
      * 初始化dns服务api连接
      *
@@ -29,7 +29,7 @@ public interface IDNSServer {
      * @param domainName
      * @return 解析列表
      */
-    List<ResolutionRecord> queryList(String domainName) throws Exception;
+    List<T> queryList(String domainName) throws Exception;
 
     /**
      * 修改某一条解析记录
@@ -37,5 +37,5 @@ public interface IDNSServer {
      * @param resolutionRecord 被修改的记录
      * @return 修改结果
      */
-    boolean updateResolutionRecord(ResolutionRecord resolutionRecord) throws Exception;
+    boolean updateResolutionRecord(T resolutionRecord) throws Exception;
 }

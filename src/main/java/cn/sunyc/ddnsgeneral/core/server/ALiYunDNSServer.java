@@ -1,6 +1,6 @@
 package cn.sunyc.ddnsgeneral.core.server;
 
-import cn.sunyc.ddnsgeneral.domain.ResolutionRecord;
+import cn.sunyc.ddnsgeneral.domain.resolution.BaseResolutionRecord;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.alidns20150109.Client;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class ALiYunDNSServer extends BaseDNSServer {
+public class ALiYunDNSServer extends BaseDNSServer<BaseResolutionRecord> {
 
     /**
      * 您的AccessKey ID
@@ -48,13 +48,13 @@ public class ALiYunDNSServer extends BaseDNSServer {
             this.client = new Client(config);
         } catch (Exception e) {
             log.error("[ALiYunDNSServer] init error.", e);
-            throw new IllegalArgumentException("DNSServer 初始化失败:" + e.getMessage());
+            throw new IllegalArgumentException("ALiYunDNSServer 初始化失败:" + e.getMessage());
         }
         log.info("[ALiYunDNSServer] init success.");
     }
 
     @Override
-    public List<ResolutionRecord> queryList(String domainName) throws Exception {
+    public List<BaseResolutionRecord> queryList(String domainName) throws Exception {
         final DescribeDomainRecordsRequest describeDomainRecordsRequest = new DescribeDomainRecordsRequest();
         // 这里尽量直接查出来所有,所以写了1W个
         describeDomainRecordsRequest.setPageSize(500L);
@@ -62,8 +62,8 @@ public class ALiYunDNSServer extends BaseDNSServer {
         // 得到响应
         final DescribeDomainRecordsResponse recordsResponse = client.describeDomainRecords(describeDomainRecordsRequest);
         final List<DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecordsRecord> records = Optional.ofNullable(recordsResponse).map(DescribeDomainRecordsResponse::getBody).map(DescribeDomainRecordsResponseBody::getDomainRecords).map(DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecords::getRecord).orElse(new ArrayList<>());
-        final List<ResolutionRecord> resolutionRecords = records.stream().map(record -> {
-            ResolutionRecord resolutionRecord = new ResolutionRecord();
+        final List<BaseResolutionRecord> resolutionRecords = records.stream().map(record -> {
+            BaseResolutionRecord resolutionRecord = new BaseResolutionRecord();
             resolutionRecord.setRecordId(record.getRecordId());
             resolutionRecord.setDomain(record.getDomainName());
             resolutionRecord.setSubDomain(record.getRR());
@@ -80,7 +80,7 @@ public class ALiYunDNSServer extends BaseDNSServer {
     }
 
     @Override
-    public boolean updateResolutionRecord(ResolutionRecord resolutionRecord) throws Exception {
+    public boolean updateResolutionRecord(BaseResolutionRecord resolutionRecord) throws Exception {
         final UpdateDomainRecordRequest updateDomainRecordRequest = new UpdateDomainRecordRequest();
         updateDomainRecordRequest.setRecordId(resolutionRecord.getRecordId());
         updateDomainRecordRequest.setType(resolutionRecord.getRecordType());
@@ -90,7 +90,9 @@ public class ALiYunDNSServer extends BaseDNSServer {
 
         Optional.ofNullable(resolutionRecord.getMx()).ifPresent(mx -> updateDomainRecordRequest.setPriority(mx.longValue()));
 
+        log.info("[ALiYunDNSServer] update request:{}", JSON.toJSONString(updateDomainRecordRequest));
         final UpdateDomainRecordResponse updateResponse = client.updateDomainRecord(updateDomainRecordRequest);
+        log.info("[ALiYunDNSServer] update response:{}", JSON.toJSONString(updateResponse));
 
         return Optional.ofNullable(updateResponse).map(UpdateDomainRecordResponse::getBody).map(UpdateDomainRecordResponseBody::getRecordId).isPresent();
     }

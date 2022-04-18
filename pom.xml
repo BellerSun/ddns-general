@@ -62,6 +62,13 @@
             <artifactId>alidns20150109</artifactId>
             <version>2.0.1</version>
         </dependency>
+
+        <!--华为云dns解析sdk使用-->
+        <dependency>
+            <groupId>com.huaweicloud.sdk</groupId>
+            <artifactId>huaweicloud-sdk-dns</artifactId>
+            <version>3.0.84</version>
+        </dependency>
     </dependencies>
 
     <build>
