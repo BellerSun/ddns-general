@@ -1,18 +1,28 @@
 server:
   port: 50001
+logging:
+  config: classpath:log.xml
 
-sunyc:
-  dns:
-    server:
-      type: HUAWEI #服务器类型
-      param: '{"ak":"","sk":""}' #服务器所需参数
-  ddns:
-    domain:
-      name: 'hadoop.net.cn'  #主域名
-      subName: 'www'  #解析域名的前缀
-    record:
-      aliveTime: 1000000 #  上次查询的解析记录，保存1000秒，大概16.6分钟
-  scheduler:
-    cron: '0 0/1 * * * ? ' # 记录的轮询时间设置
-  system:
-    activate: true #系统默认启动与否。
+spring:
+  datasource:
+    url: jdbc:h2:file:/ddns-general/db
+    platform: h2
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        use_sql_comments: true
+        format_sql: true
+  h2:
+    console:
+      enabled: true
+      path: /console
+      settings:
+        trace: false
+        web-allow-others: false

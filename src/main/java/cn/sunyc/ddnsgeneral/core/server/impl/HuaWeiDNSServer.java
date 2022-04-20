@@ -1,5 +1,6 @@
-package cn.sunyc.ddnsgeneral.core.server;
+package cn.sunyc.ddnsgeneral.core.server.impl;
 
+import cn.sunyc.ddnsgeneral.core.server.BaseDNSServer;
 import cn.sunyc.ddnsgeneral.domain.SystemConstant;
 import cn.sunyc.ddnsgeneral.domain.resolution.HuaWeiResolutionRecord;
 import com.alibaba.fastjson.JSON;
@@ -43,7 +44,6 @@ public class HuaWeiDNSServer extends BaseDNSServer<HuaWeiResolutionRecord> {
     @Override
     public void init(JSONObject initializeParam) throws IllegalArgumentException {
         super.init(initializeParam);
-        log.info("[HuaWeiDNSServer] initializeParam:{}", JSON.toJSONString(initializeParam));
         try {
             ICredential auth = new BasicCredentials().withAk(initializeParam.getString(AK_KEY)).withSk(initializeParam.getString(SK_KEY));
             this.client = DnsClient.newBuilder().withCredential(auth).withRegion(DnsRegion.valueOf((String) initializeParam.getOrDefault(DNS_REGION_KEY, "cn-east-2"))).build();
@@ -57,6 +57,7 @@ public class HuaWeiDNSServer extends BaseDNSServer<HuaWeiResolutionRecord> {
     @Override
     public List<HuaWeiResolutionRecord> queryList(String domainName) throws Exception {
         ListRecordSetsRequest request = new ListRecordSetsRequest();
+        request.setName(domainName);
         try {
             ListRecordSetsResponse response = client.listRecordSets(request);
 

@@ -1,9 +1,9 @@
 package cn.sunyc.ddnsgeneral;
 
-import cn.sunyc.ddnsgeneral.core.server.ALiYunDNSServer;
-import cn.sunyc.ddnsgeneral.core.server.HuaWeiDNSServer;
+import cn.sunyc.ddnsgeneral.core.server.impl.ALiYunDNSServer;
+import cn.sunyc.ddnsgeneral.core.server.impl.HuaWeiDNSServer;
 import cn.sunyc.ddnsgeneral.core.server.IDNSServer;
-import cn.sunyc.ddnsgeneral.core.server.TencentDNSServer;
+import cn.sunyc.ddnsgeneral.core.server.impl.TencentDNSServer;
 import cn.sunyc.ddnsgeneral.domain.resolution.BaseResolutionRecord;
 import cn.sunyc.ddnsgeneral.domain.resolution.HuaWeiResolutionRecord;
 import cn.sunyc.ddnsgeneral.utils.HttpUtil;

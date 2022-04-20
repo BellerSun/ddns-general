@@ -1,5 +1,6 @@
-package cn.sunyc.ddnsgeneral.core.server;
+package cn.sunyc.ddnsgeneral.core.server.impl;
 
+import cn.sunyc.ddnsgeneral.core.server.BaseDNSServer;
 import cn.sunyc.ddnsgeneral.domain.resolution.BaseResolutionRecord;
 import cn.sunyc.ddnsgeneral.utils.HttpUtil;
 import com.alibaba.fastjson.JSON;

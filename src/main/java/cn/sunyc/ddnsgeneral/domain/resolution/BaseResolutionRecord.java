@@ -3,7 +3,7 @@ package cn.sunyc.ddnsgeneral.domain.resolution;
 import lombok.Data;
 
 /**
- * 存储域名解析记录的对象
+ * 存储域名解析记录的对象，这里是根据经验整理出来的一些都会有的。但是某些云服务商的字段、甚至数据结构都不一致，那到时候可生成子类。
  *
  * @author ：sun yu chao
  * @date ：Created in 2021/3/13 17:01

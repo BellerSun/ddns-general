@@ -1,5 +1,6 @@
-package cn.sunyc.ddnsgeneral.core.server;
+package cn.sunyc.ddnsgeneral.core.server.impl;
 
+import cn.sunyc.ddnsgeneral.core.server.BaseDNSServer;
 import cn.sunyc.ddnsgeneral.domain.resolution.BaseResolutionRecord;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -39,7 +40,6 @@ public class ALiYunDNSServer extends BaseDNSServer<BaseResolutionRecord> {
     @Override
     public void init(JSONObject initializeParam) throws IllegalArgumentException {
         super.init(initializeParam);
-        log.info("[ALiYunDNSServer] initializeParam:{}", JSON.toJSONString(initializeParam));
         Config config = new Config()
                 .setAccessKeyId(initializeParam.getString(AK_KEY))
                 .setAccessKeySecret(initializeParam.getString(SK_KEY))
@@ -56,7 +56,7 @@ public class ALiYunDNSServer extends BaseDNSServer<BaseResolutionRecord> {
     @Override
     public List<BaseResolutionRecord> queryList(String domainName) throws Exception {
         final DescribeDomainRecordsRequest describeDomainRecordsRequest = new DescribeDomainRecordsRequest();
-        // 这里尽量直接查出来所有,所以写了1W个
+        // 这里尽量直接查出来所有,所以写了很多个
         describeDomainRecordsRequest.setPageSize(500L);
         describeDomainRecordsRequest.setDomainName(domainName);
         // 得到响应
