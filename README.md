@@ -43,7 +43,7 @@
 
 ----------
 ## 依赖项:
-项目中获取物理机外网ip调用的是孙玉朝的ip检测接口[post:   http://ip.sunyc.cn](http://ip.sunyc.cn)
+项目中获取物理机外网ip调用的是孙玉朝的ip检测接口[post:   http://ip.apache.plus](http://ip.sunyc.cn)
 
 ----------
 ## License
