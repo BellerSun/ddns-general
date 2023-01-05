@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <property name="LOG_DIR" value="/home/admin/ddns-general/logs" />
+    <property name="LOG_DIR" value="~/ddns-general/logs" />
     <property name="APP_NAME" value="ddns-general" />
 
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
