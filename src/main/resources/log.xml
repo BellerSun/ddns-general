@@ -59,14 +59,14 @@
 
     <springProfile name="production">
         <root level="INFO" additivity="false">
-            <!--<appender-ref ref="console"/>-->
+            <appender-ref ref="console"/>
             <appender-ref ref="rollingAppender"/>
             <appender-ref ref="errorAppender"/>
         </root>
     </springProfile>
     <springProfile name="!production">
         <root level="INFO" additivity="false">
-            <!--<appender-ref ref="console"/>-->
+            <appender-ref ref="console"/>
             <appender-ref ref="rollingAppender"/>
         </root>
     </springProfile>
