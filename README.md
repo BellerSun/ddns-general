@@ -1,6 +1,6 @@
 ## ddns-general
   通用的ddns服务器代码，使用H2在本地存储你的DNS解析服务商配置。   
-  H2数据库地址:[http://localhost:50001/console]  账号SA，无密码。
+  H2数据库地址:[http://localhost:3364/console]  账号SA，无密码。
 
 ----------
 ## 更新特性:
