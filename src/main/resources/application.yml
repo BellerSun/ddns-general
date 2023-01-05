@@ -1,5 +1,6 @@
 server:
-  port: 50001
+  # 为啥是3364呢？因为九键键盘的DDNS就是3364
+  port: 3364
 logging:
   config: classpath:log.xml
 
