@@ -17,7 +17,7 @@ public class IpUtil {
     /**
      * ip查询服务的地址
      */
-    private static final String IP_SERVER_URL = "http://ip.sunyc.cn";
+    private static final String IP_SERVER_URL = "http://ip.apache.plus";
 
     /**
      * 获取本机的外网ip，出现任何异常都会返回默认ip 127.0.0.1
