@@ -19,9 +19,18 @@
         * HUAWEI：华为云
 * dns解析服务商必须参数,json格式字符串。
     * ${dnsServerParam}
-        * 腾讯云：login_token 登陆令牌，在腾讯云官网 [token设置页][tencent_token]生成login_token
+        * 腾讯云：login_token 登陆令牌，在腾讯云官网 [token设置页][tencent_token]生成login_token 
+        ```json
+        {"login_token": "yourToken"}
+        ```
         * 阿里云：ak访问id，sk访问密匙，在阿里云个人中心 [用户信息管理页][aliyun_token]生成ak、sk
+        ```json
+        {"ak": "yourAk","sk": "yourSk"}
+        ```
         * 华为云：ak访问id，sk访问密匙，在华为云个人中心 [我的凭证页][huawei_token]生成ak、sk
+        ```json
+        {"ak": "yourAk","sk": "yourSk"}
+        ```
 
 * 动态解析的主域名:【baidu.com】
     * ${domainName}
