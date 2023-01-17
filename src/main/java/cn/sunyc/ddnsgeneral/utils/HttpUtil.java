@@ -3,6 +3,7 @@ package cn.sunyc.ddnsgeneral.utils;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 
@@ -54,7 +55,8 @@ public class HttpUtil {
         PrintWriter writer = null;
         try {
             // 创建URL对象
-            URL url = new URL(urlStr);
+            //URL url = new URL(urlStr);
+            URL url = new URL(new URI(urlStr).toASCIIString());
             // 获取请求参数
             String param = getParamString(paramMap);
             // 获取URL连接
