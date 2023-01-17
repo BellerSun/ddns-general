@@ -1,49 +1,32 @@
 package cn.sunyc.ddnsgeneral.core.server.impl;
 
 import cn.sunyc.ddnsgeneral.core.server.BaseDNSServer;
+import cn.sunyc.ddnsgeneral.core.server.param.InitArgsALi;
 import cn.sunyc.ddnsgeneral.domain.resolution.BaseResolutionRecord;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.aliyun.alidns20150109.Client;
 import com.aliyun.alidns20150109.models.*;
 import com.aliyun.teaopenapi.models.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class ALiYunDNSServer extends BaseDNSServer<BaseResolutionRecord> {
-
-    /**
-     * 您的AccessKey ID
-     */
-    private static final String AK_KEY = "ak";
-    /**
-     * 您的AccessKey Secret
-     */
-    private static final String SK_KEY = "sk";
-    /**
-     * 访问的域名
-     */
-    private static final String ENDPOINT_KEY = "endpoint";
+public class ALiYunDNSServer extends BaseDNSServer<BaseResolutionRecord, InitArgsALi> {
 
     private Client client;
 
     @Override
-    protected Collection<String> getCheckParams() {
-        return Arrays.asList(AK_KEY, SK_KEY);
-    }
-
-    @Override
-    public void init(JSONObject initializeParam) throws IllegalArgumentException {
-        super.init(initializeParam);
-        Config config = new Config()
-                .setAccessKeyId(initializeParam.getString(AK_KEY))
-                .setAccessKeySecret(initializeParam.getString(SK_KEY))
-                .setEndpoint((String) initializeParam.getOrDefault(ENDPOINT_KEY, "dns.aliyuncs.com"));
+    protected void initSub(InitArgsALi initArgsALi) {
+        final Config config = new Config()
+                .setAccessKeyId(initArgsALi.getAk())
+                .setAccessKeySecret(initArgsALi.getSk())
+                .setEndpoint(initArgsALi.getEndpoint());
         try {
             this.client = new Client(config);
         } catch (Exception e) {

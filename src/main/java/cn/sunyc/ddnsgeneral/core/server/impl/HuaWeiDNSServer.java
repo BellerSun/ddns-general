@@ -1,10 +1,10 @@
 package cn.sunyc.ddnsgeneral.core.server.impl;
 
 import cn.sunyc.ddnsgeneral.core.server.BaseDNSServer;
+import cn.sunyc.ddnsgeneral.core.server.param.InitArgsHuaWei;
 import cn.sunyc.ddnsgeneral.domain.SystemConstant;
 import cn.sunyc.ddnsgeneral.domain.resolution.HuaWeiResolutionRecord;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.huaweicloud.sdk.core.auth.BasicCredentials;
 import com.huaweicloud.sdk.core.auth.ICredential;
 import com.huaweicloud.sdk.dns.v2.DnsClient;
@@ -18,35 +18,15 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class HuaWeiDNSServer extends BaseDNSServer<HuaWeiResolutionRecord> {
-
-    /**
-     * 您的AccessKey ID
-     */
-    private static final String AK_KEY = "ak";
-    /**
-     * 您的AccessKey Secret
-     */
-    private static final String SK_KEY = "sk";
-    /**
-     * 访问的域名
-     */
-    private static final String DNS_REGION_KEY = "dnsRegion";
+public class HuaWeiDNSServer extends BaseDNSServer<HuaWeiResolutionRecord, InitArgsHuaWei> {
 
     private DnsClient client;
 
     @Override
-    protected Collection<String> getCheckParams() {
-        return Arrays.asList(AK_KEY, SK_KEY);
-    }
-
-
-    @Override
-    public void init(JSONObject initializeParam) throws IllegalArgumentException {
-        super.init(initializeParam);
+    protected void initSub(InitArgsHuaWei initArgsHuaWei) {
         try {
-            ICredential auth = new BasicCredentials().withAk(initializeParam.getString(AK_KEY)).withSk(initializeParam.getString(SK_KEY));
-            this.client = DnsClient.newBuilder().withCredential(auth).withRegion(DnsRegion.valueOf((String) initializeParam.getOrDefault(DNS_REGION_KEY, "cn-east-2"))).build();
+            final ICredential auth = new BasicCredentials().withAk(initArgsHuaWei.getAk()).withSk(initArgsHuaWei.getSk());
+            this.client = DnsClient.newBuilder().withCredential(auth).withRegion(DnsRegion.valueOf(initArgsHuaWei.getDnsRegion())).build();
         } catch (Exception e) {
             log.error("[HuaWeiDNSServer] init error.", e);
             throw new IllegalArgumentException("HuaWeiDNSServer 初始化失败:" + e.getMessage());

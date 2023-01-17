@@ -1,6 +1,7 @@
 package cn.sunyc.ddnsgeneral.core.server.impl;
 
 import cn.sunyc.ddnsgeneral.core.server.BaseDNSServer;
+import cn.sunyc.ddnsgeneral.core.server.param.InitArgsToken;
 import cn.sunyc.ddnsgeneral.domain.resolution.BaseResolutionRecord;
 import cn.sunyc.ddnsgeneral.utils.HttpUtil;
 import com.alibaba.fastjson.JSON;
@@ -21,17 +22,8 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class TencentDNSServer extends BaseDNSServer<BaseResolutionRecord> {
+public class TencentDNSServer extends BaseDNSServer<BaseResolutionRecord, InitArgsToken> {
     private static final String API_BASE_URL = "https://dnsapi.cn/";
-
-    private static String login_token;
-
-    @Override
-    public void init(JSONObject initializeParam) throws IllegalArgumentException {
-        super.init(initializeParam);
-        login_token = initializeParam.getString("login_token");
-
-    }
 
     @Override
     public List<BaseResolutionRecord> queryList(String domainName) throws Exception {
@@ -84,14 +76,9 @@ public class TencentDNSServer extends BaseDNSServer<BaseResolutionRecord> {
         return commonResp.isSuccess();
     }
 
-    @Override
-    protected Collection<String> getCheckParams() {
-        return Collections.singletonList("login_token");
-    }
-
     private HashMap<String, String> getDefaultRequestParams() {
         HashMap<String, String> params = new HashMap<>();
-        params.put("login_token", login_token);
+        params.put("login_token", this.getInitArgs().getLoginToken());
         params.put("format", "json");
         params.put("lang", "cn");
         params.put("error_on_empty", "no");

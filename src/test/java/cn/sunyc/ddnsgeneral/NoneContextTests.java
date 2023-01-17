@@ -4,10 +4,13 @@ import cn.sunyc.ddnsgeneral.core.server.impl.ALiYunDNSServer;
 import cn.sunyc.ddnsgeneral.core.server.impl.HuaWeiDNSServer;
 import cn.sunyc.ddnsgeneral.core.server.IDNSServer;
 import cn.sunyc.ddnsgeneral.core.server.impl.TencentDNSServer;
+import cn.sunyc.ddnsgeneral.core.server.param.*;
 import cn.sunyc.ddnsgeneral.domain.resolution.BaseResolutionRecord;
 import cn.sunyc.ddnsgeneral.domain.resolution.HuaWeiResolutionRecord;
 import cn.sunyc.ddnsgeneral.utils.HttpUtil;
 import cn.sunyc.ddnsgeneral.utils.IpUtil;
+import cn.sunyc.ddnsgeneral.utils.ObjUtil;
+import cn.sunyc.ddnsgeneral.utils.ValidateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -24,7 +27,7 @@ import java.util.stream.Collectors;
  * @modified By：none
  * @version: 1.0.0
  */
-public class NoneContextText {
+public class NoneContextTests {
     @Test
     void main() {
         System.out.println("hello");
@@ -35,12 +38,10 @@ public class NoneContextText {
         String post = IpUtil.getOutSideIp();
 
         System.out.println(post);
-
     }
 
     @Test
     void testTencentDnsApi() throws Exception {
-
 
         /*
          * 参数名称 	                描述 	                                        必选
@@ -51,7 +52,7 @@ public class NoneContextText {
          * user_id 	用户的ID，仅代理接口需要，用户接口不需要提交此参数。 	            否
          */
         HashMap<String, String> param = new HashMap<>();
-        param.put("login_token", "221148,3e298c3548dc68a1f3516d84d15db6a6");
+        param.put("login_token", "");
         param.put("format", "json");
         param.put("lang", "cn");
         param.put("error_on_empty", "no");
@@ -106,7 +107,7 @@ public class NoneContextText {
     void testAliYunServer() throws Exception {
         String ak = "";
         String sk = "";
-        String endpoint ="alidns.cn-beijing.aliyuncs.com";
+        String endpoint = "alidns.cn-beijing.aliyuncs.com";
         String domainName = "springboot.top";
         String subDomainName = "www";
         String type = "A";
@@ -182,5 +183,72 @@ public class NoneContextText {
         boolean result = idnsServer.updateResolutionRecord(baseResolutionRecord);
         System.out.println("修改结果：");
         System.out.println(result);
+    }
+
+
+    @Test
+    public void testInitArgsCheck() {
+        // 通过
+        InitArgsAbs args = new InitArgsALi("a", "b", "c");
+        ValidateUtil.validate(args);
+        ValidateUtil.valid(args);
+
+        // 通过
+        args = new InitArgsALi("a", "b", null);
+        ValidateUtil.validate(args);
+        ValidateUtil.valid(args);
+
+        // 不通过
+        //args = new InitArgsALi("a", null, null);
+        //      on field 'sk': rejected value [null]
+        //ValidateUtil.validate(args);
+        //      不能为空
+        //ValidateUtil.validCheck(args);
+
+        // 不通过
+        //args = new InitArgsALi();
+        //      on field 'ak': rejected value [null]  on field 'sk': rejected value [null]
+        //ValidateUtil.validate(args);
+        //      不能为空
+        //ValidateUtil.validCheck(args);
+
+        // 通过
+        args = new InitArgsAkSK("a", "b");
+        ValidateUtil.validate(args);
+        ValidateUtil.valid(args);
+
+
+        // 不通过
+        args = new InitArgsAkSK(null, "b");
+        //ValidateUtil.validate(args);
+        //ValidateUtil.validCheck(args);
+
+
+        // 通过
+        args = new InitArgsToken("a");
+        ValidateUtil.validate(args);
+        ValidateUtil.valid(args);
+
+
+        /* 不通过
+        //args = new InitArgsToken();
+        //ValidateUtil.validate(args);
+        //ValidateUtil.validCheck(args);
+        */
+    }
+
+
+    @Test
+    public void testReflect() {
+        final ALiYunDNSServer aLiYunDNSServer = new ALiYunDNSServer();
+        System.out.println(ObjUtil.getGenericType(aLiYunDNSServer));
+        System.out.println(ObjUtil.getGenericType(aLiYunDNSServer, InitArgsAbs.class));
+    }
+
+
+    @Test
+    public void testIp() {
+        String outSideIp = IpUtil.getOutSideIp();
+        System.out.println(outSideIp);
     }
 }
