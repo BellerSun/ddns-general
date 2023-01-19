@@ -21,7 +21,7 @@ import java.util.List;
  */
 @RestController
 @SuppressWarnings("unused")
-@RequestMapping("/manager")
+@RequestMapping("/api/manager")
 public class ManagerController {
 
     @Resource

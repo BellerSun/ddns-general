@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @SuppressWarnings("unused")
-@RequestMapping("/monitor")
+@RequestMapping("/api/monitor")
 public class MonitorController {
 
 
