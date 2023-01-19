@@ -45,6 +45,7 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
     public void init(DDNSConfigDO ddnsConfigDO) {
         log.info("[DDNS_RUNNER] init DDNSRunner start. DDNSProperties:{}", ddnsConfigDO.toString());
         this.ddnsConfigDO = ddnsConfigDO;
+        // 重复调用init的幂等逻辑
         close();
         Class<? extends IDNSServer<T>> dnsServerTypeByName = (Class<? extends IDNSServer<T>>) DNSServerType.getDNSServerTypeByName(ddnsConfigDO.getDnsServerType());
         if (null == dnsServerTypeByName) {

@@ -1,6 +1,5 @@
 package cn.sunyc.ddnsgeneral.domain.db;
 
-import cn.sunyc.ddnsgeneral.domain.SystemConstant;
 import cn.sunyc.ddnsgeneral.domain.db.key.DDNSConfigKey;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.AllArgsConstructor;
@@ -81,6 +80,6 @@ public class DDNSConfigDO implements Serializable {
      * 生成能够唯一代表这个对象的key
      */
     public String generateUniqueKey() {
-        return this.getDdnsConfigKey().getDomainSubName() + SystemConstant.DOMAIN_SPLIT + this.getDdnsConfigKey().getDomainName();
+        return this.getDdnsConfigKey().generateUniqueKey();
     }
 }

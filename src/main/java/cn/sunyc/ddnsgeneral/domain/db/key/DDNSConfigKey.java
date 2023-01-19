@@ -1,5 +1,6 @@
 package cn.sunyc.ddnsgeneral.domain.db.key;
 
+import cn.sunyc.ddnsgeneral.domain.SystemConstant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,4 +27,8 @@ public class DDNSConfigKey implements Serializable {
     @Column(length = 100)
     private String domainSubName;
 
+
+    public String generateUniqueKey() {
+        return this.getDomainSubName() + SystemConstant.DOMAIN_SPLIT + this.getDomainName();
+    }
 }

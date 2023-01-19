@@ -1,6 +1,7 @@
 package cn.sunyc.ddnsgeneral.core;
 
 import cn.sunyc.ddnsgeneral.domain.db.DDNSConfigDO;
+import cn.sunyc.ddnsgeneral.domain.db.key.DDNSConfigKey;
 import cn.sunyc.ddnsgeneral.sql.DDNSConfigRepository;
 import cn.sunyc.ddnsgeneral.utils.MDCUtil;
 import com.alibaba.fastjson.JSON;
@@ -58,7 +59,7 @@ public class DDNSRunnerManager implements ApplicationContextAware {
     }
 
 
-    private void refreshDDNSRunner(DDNSConfigDO ddnsConfigDO) {
+    public void refreshDDNSRunner(DDNSConfigDO ddnsConfigDO) {
         final String uniqueKey = ddnsConfigDO.generateUniqueKey();
         log.info("[DDNS_RUNNER_MANAGER] refresh ddns runner. uniqueKey:{}", uniqueKey);
         final DDNSRunner<?> ddnsRunner = runnerCacheMap.getOrDefault(uniqueKey, new DDNSRunner<>(this.applicationContext));
@@ -72,8 +73,18 @@ public class DDNSRunnerManager implements ApplicationContextAware {
         runnerCacheMap.put(uniqueKey, ddnsRunner);
     }
 
+    public void removeDDNSRunner(DDNSConfigKey ddnsConfigKey) {
+        final String uniqueKey = ddnsConfigKey.generateUniqueKey();
+        final DDNSRunner<?> ddnsRunner = runnerCacheMap.get(uniqueKey);
+        if (null == ddnsRunner){
+            return;
+        }
+        ddnsRunner.close();
+    }
+
 
     @Override
+    @SuppressWarnings("all")
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
@@ -83,10 +94,4 @@ public class DDNSRunnerManager implements ApplicationContextAware {
         return runnerCacheMap.values().stream().map(DDNSRunner::getDdnsConfigDO).collect(Collectors.toList());
     }
 
-    public boolean saveDDNSConfig(DDNSConfigDO ddnsConfigDO) {
-        log.info("[DDNS_RUNNER_MANAGER] save db ddns runner. ddnsConfigDO:{}", ddnsConfigDO);
-        final DDNSConfigDO configDO = ddnsConfigRepository.save(ddnsConfigDO);
-        refreshDDNSRunner(configDO);
-        return true;
-    }
 }
