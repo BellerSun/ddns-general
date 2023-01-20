@@ -2,6 +2,7 @@ package cn.sunyc.ddnsgeneral.core;
 
 import cn.sunyc.ddnsgeneral.domain.db.DDNSConfigDO;
 import cn.sunyc.ddnsgeneral.domain.db.key.DDNSConfigKey;
+import cn.sunyc.ddnsgeneral.service.LocalIpService;
 import cn.sunyc.ddnsgeneral.sql.DDNSConfigRepository;
 import cn.sunyc.ddnsgeneral.utils.MDCUtil;
 import com.alibaba.fastjson.JSON;
@@ -29,6 +30,9 @@ public class DDNSRunnerManager implements ApplicationContextAware {
 
     @Resource
     private DDNSConfigRepository ddnsConfigRepository;
+
+    @Resource
+    private LocalIpService localIpService;
 
     /**
      * 当前正在运行的runner。既方便查看、管理当前运行的runner，也可以减少新建runner
@@ -62,7 +66,7 @@ public class DDNSRunnerManager implements ApplicationContextAware {
     public void refreshDDNSRunner(DDNSConfigDO ddnsConfigDO) {
         final String uniqueKey = ddnsConfigDO.generateUniqueKey();
         log.info("[DDNS_RUNNER_MANAGER] refresh ddns runner. uniqueKey:{}", uniqueKey);
-        final DDNSRunner<?> ddnsRunner = runnerCacheMap.getOrDefault(uniqueKey, new DDNSRunner<>(this.applicationContext));
+        final DDNSRunner<?> ddnsRunner = runnerCacheMap.getOrDefault(uniqueKey, new DDNSRunner<>(this.applicationContext, localIpService));
         log.info("[DDNS_RUNNER_MANAGER] refresh ddns runner. before:{}, after:{}", JSON.toJSONString(ddnsRunner.getDdnsConfigDO()), JSON.toJSONString(ddnsConfigDO));
         try {
             ddnsRunner.init(ddnsConfigDO);
@@ -76,7 +80,7 @@ public class DDNSRunnerManager implements ApplicationContextAware {
     public void removeDDNSRunner(DDNSConfigKey ddnsConfigKey) {
         final String uniqueKey = ddnsConfigKey.generateUniqueKey();
         final DDNSRunner<?> ddnsRunner = runnerCacheMap.get(uniqueKey);
-        if (null == ddnsRunner){
+        if (null == ddnsRunner) {
             return;
         }
         ddnsRunner.close();

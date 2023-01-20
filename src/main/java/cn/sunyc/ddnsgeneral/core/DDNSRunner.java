@@ -5,7 +5,7 @@ import cn.sunyc.ddnsgeneral.domain.SystemConstant;
 import cn.sunyc.ddnsgeneral.domain.db.DDNSConfigDO;
 import cn.sunyc.ddnsgeneral.domain.resolution.BaseResolutionRecord;
 import cn.sunyc.ddnsgeneral.enumeration.DNSServerType;
-import cn.sunyc.ddnsgeneral.utils.IpUtil;
+import cn.sunyc.ddnsgeneral.service.LocalIpService;
 import cn.sunyc.ddnsgeneral.utils.MDCUtil;
 import com.alibaba.fastjson.JSON;
 import lombok.Getter;
@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
     private final ApplicationContext applicationContext;
+    private final LocalIpService localIpService;
 
     @Getter
     private DDNSConfigDO ddnsConfigDO;
@@ -37,8 +38,9 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
 
     private ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
-    public DDNSRunner(ApplicationContext applicationContext) {
+    public DDNSRunner(ApplicationContext applicationContext, LocalIpService localIpService) {
         this.applicationContext = applicationContext;
+        this.localIpService = localIpService;
     }
 
     @SuppressWarnings("unchecked")
@@ -96,7 +98,7 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
             }
             try {
                 // 查询当前外网ip
-                String nowOutSideIp = IpUtil.getOutSideIp();
+                final String nowOutSideIp = localIpService.getLocalOutSideIp();
 
                 // 当查询结果与上次记录解析结果相同，并且上次结果在有效期内，就等待(是担心别人通过其他渠道修改了解析记录，可是我们这里却不刷新)。
                 if (nowOutSideIp.equalsIgnoreCase(preRecordIp) && (System.currentTimeMillis() - preRecordQueryTime) < ddnsConfigDO.getDdnsRecordAliveTime()) {
