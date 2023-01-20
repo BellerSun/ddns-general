@@ -53,7 +53,9 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
         }
 
         try {
+            //注意，实现类的Scope都是protoType
             this.dnsServer = applicationContext.getBean(dnsServerTypeByName);
+            log.info("[DDNS_RUNNER] getBeanFinished. type:{}, instance:{}", dnsServerTypeByName.getSimpleName(), dnsServer);
         } catch (Exception ignore) {
             throw new IllegalArgumentException("ddns server bean get error, dis server type:" + dnsServerTypeByName + ", support ddns server type:" + DNSServerType.getValidNames());
         }

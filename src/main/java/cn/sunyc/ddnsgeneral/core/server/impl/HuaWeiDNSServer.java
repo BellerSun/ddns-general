@@ -11,13 +11,19 @@ import com.huaweicloud.sdk.dns.v2.DnsClient;
 import com.huaweicloud.sdk.dns.v2.model.*;
 import com.huaweicloud.sdk.dns.v2.region.DnsRegion;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class HuaWeiDNSServer extends BaseDNSServer<HuaWeiResolutionRecord, InitArgsHuaWei> {
 
     private DnsClient client;

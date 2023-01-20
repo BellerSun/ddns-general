@@ -8,9 +8,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -22,6 +26,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class TencentDNSServer extends BaseDNSServer<BaseResolutionRecord, InitArgsToken> {
     private static final String API_BASE_URL = "https://dnsapi.cn/";
 

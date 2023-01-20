@@ -8,6 +8,8 @@ import com.aliyun.alidns20150109.Client;
 import com.aliyun.alidns20150109.models.*;
 import com.aliyun.teaopenapi.models.Config;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ALiYunDNSServer extends BaseDNSServer<BaseResolutionRecord, InitArgsALi> {
 
     private Client client;
