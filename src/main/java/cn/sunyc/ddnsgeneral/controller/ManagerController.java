@@ -4,6 +4,7 @@ import cn.sunyc.ddnsgeneral.core.DDNSRunnerManager;
 import cn.sunyc.ddnsgeneral.domain.db.DDNSConfigDO;
 import cn.sunyc.ddnsgeneral.domain.db.key.DDNSConfigKey;
 import cn.sunyc.ddnsgeneral.service.DDNSConfigService;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,7 +49,7 @@ public class ManagerController {
     }
 
     @RequestMapping({"/ddnsConfig/save"})
-    public boolean save(DDNSConfigDO ddnsConfigDO) {
+    public boolean save(@RequestBody DDNSConfigDO ddnsConfigDO) {
         return ddnsConfigService.saveDDNSConfig(ddnsConfigDO);
     }
 
