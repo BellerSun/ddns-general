@@ -2,21 +2,21 @@ package cn.sunyc.ddnsgeneral.domain.db;
 
 import cn.sunyc.ddnsgeneral.domain.db.key.DDNSConfigKey;
 import com.alibaba.fastjson.annotation.JSONField;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * H2数据表
  */
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -81,5 +81,18 @@ public class DDNSConfigDO implements Serializable {
      */
     public String generateUniqueKey() {
         return this.getDdnsConfigKey().generateUniqueKey();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        DDNSConfigDO that = (DDNSConfigDO) o;
+        return ddnsConfigKey != null && Objects.equals(ddnsConfigKey, that.ddnsConfigKey);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ddnsConfigKey);
     }
 }
