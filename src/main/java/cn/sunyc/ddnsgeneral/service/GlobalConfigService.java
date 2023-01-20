@@ -19,11 +19,30 @@ public class GlobalConfigService {
     @Resource
     GlobalConfigRepository globalConfigRepository;
 
-
+    /**
+     * 查询配置
+     *
+     * @param key        配置key
+     * @param clazz      配置类型
+     * @param <T>        配置类型
+     * @return 配置转换后的值
+     */
     public <T> T queryConfig(String key, Class<T> clazz) {
         final Optional<GlobalConfigDO> doOptional = globalConfigRepository.findById(key);
         final String val = doOptional.map(GlobalConfigDO::getConfigVal).orElse(null);
         return JSON.parseObject(val, clazz);
     }
 
+    /**
+     * 查询配置
+     *
+     * @param key        配置key
+     * @param clazz      配置类型
+     * @param defaultVal 默认值
+     * @param <T>        配置类型
+     * @return 配置转换后的值
+     */
+    public <T> T queryConfig(String key, Class<T> clazz, T defaultVal) {
+        return Optional.ofNullable(queryConfig(key, clazz)).orElse(defaultVal);
+    }
 }
