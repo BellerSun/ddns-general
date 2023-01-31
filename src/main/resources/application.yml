@@ -6,7 +6,7 @@ logging:
 
 spring:
   datasource:
-    url: jdbc:h2:file:~/ddns-general/db
+    url: jdbc:h2:file:~/ddns-general/h2/db
     platform: h2
     username: sa
     password:
@@ -27,3 +27,5 @@ spring:
       settings:
         trace: false
         web-allow-others: false
+  profiles:
+    active: production
