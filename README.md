@@ -1,11 +1,28 @@
 ## ddns-general
-  通用的ddns服务器代码，使用H2在本地存储你的DNS解析服务商配置。   
-  H2数据库地址:[http://localhost:3364/console](http://localhost:3364/console)  账号SA，无密码。    
-  后台管理页面地址:[http://localhost:3364/html/index](http://localhost:3364/html/index) 
+通用的ddns服务器代码，使用H2在本地存储你的DNS解析服务商配置。
+----------
+## 部署:
+Docker镜像部署:[DockerHub](https://hub.docker.com/r/bellersun/ddns-general)
+```shell
+# 拉镜像，tag需要根据情况自行选择，这里使用测试tag
+docker pull bellersun/ddns-general:test-01
+# [3364] 是管理页面端口.
+# [/root/ddns-general/h2] 是存储到本地的配置，如果不挂载出来，重新启动镜像会丢失配置。
+docker run -d -p 3364:3364 -v ~/ddns-general/h2:/root/ddns-general/h2  bellersun/ddns-general:test-01
+```
+Jar部署:
+```shell
+java -jar ddns-general.jar
+```
+----------
+## 链接:
+本地H2数据库地址:[http://localhost:3364/console](http://localhost:3364/console)  账号SA，无密码
+
+本地后台管理页面地址:[http://localhost:3364/html/index](http://localhost:3364/html/index)
 ----------
 ## 更新特性:
 后续会添加更多功能：
-  * docker镜像启动
+  * 端口、日志目录、配置目录支持环境变量配置
   * 更多域名解析商支持（如果没有你想要的，可以提Issues）
   * 页面管理H2中的DNS服务解析商配置（哪位小伙伴可以帮忙做页面~已经搭建[基础页面](http://localhost:3364/html/index)）
 
