@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.util.Assert;
 
 import java.io.Closeable;
 import java.util.List;
@@ -31,10 +32,6 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
     @Getter
     private DDNSConfigDO ddnsConfigDO;
     private IDNSServer<T> dnsServer;
-
-    private String preRecordIp = "127.0.0.1";
-    private long preRecordQueryTime = Long.MIN_VALUE;
-
 
     private ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
@@ -87,13 +84,20 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
     }
 
     private final class DoDDNSRunnable implements Runnable {
-
+        /**
+         * 上次解析出来的ip
+         */
+        private String preRecordIp = "127.0.0.1";
+        /**
+         * 上次执行查询的时间
+         */
+        private long preRecordQueryTime = Long.MIN_VALUE;
         @Override
         public void run() {
             MDCUtil.setRequestId(UUID.randomUUID() + SystemConstant.COMMON_STR_SPLIT + ("【" + ddnsConfigDO.generateUniqueKey() + "】"));
             log.info("[DDNS_RUNNER] start. DDNSProperties:{}", ddnsConfigDO.toString());
             if (!ddnsConfigDO.isActivate()) {
-                log.info("[DDNS_RUNNER] end. 系统未激活.");
+                log.info("[DDNS_RUNNER] end. not active");
                 return;
             }
             try {
@@ -107,20 +111,18 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
                 }
 
                 // 查询域名解析记录
-                List<T> baseResolutionRecords = dnsServer.queryList(ddnsConfigDO.getDdnsConfigKey().getDomainName());
-                List<T> targetRecords = baseResolutionRecords.stream().filter(Objects::nonNull)
+                final List<T> baseResolutionRecords = dnsServer.queryList(ddnsConfigDO.getDdnsConfigKey().getDomainName());
+                Assert.notNull(baseResolutionRecords, "查询解析记录失败，返回结果为null。");
+                final List<T> targetRecords = baseResolutionRecords.stream().filter(Objects::nonNull)
                         .filter(record -> ddnsConfigDO.getDdnsConfigKey().getDomainName().equals(record.getDomain()))
                         .filter(record -> ddnsConfigDO.getDdnsConfigKey().getDomainSubName().equals(record.getSubDomain()))
                         .filter(record -> ddnsConfigDO.getDdnsDomainRecordType().equals(record.getRecordType()))
                         .collect(Collectors.toList());
-                if (targetRecords.size() > 1) {
-                    throw new RuntimeException("您的输入条件查询出来了多条记录，俺不知道要修改哪一个了。");
-                } else if (targetRecords.size() < 1) {
-                    throw new RuntimeException("您的输入条件没有查询到记录，俺不知道要修改哪一个了。");
-                }
-                //  记录查询成功，刷新查询结果，和查询时间
+                Assert.isTrue(targetRecords.size() <= 1, "您的输入条件查询出来了多条记录，俺不知道要修改哪一个了。");
+                Assert.isTrue(!targetRecords.isEmpty(), "您的输入条件没有查询到记录，俺不知道要修改哪一个了。");
 
-                T baseResolutionRecord = targetRecords.get(0);
+                //  记录查询成功，刷新查询结果，和查询时间
+                final T baseResolutionRecord = targetRecords.get(0);
                 preRecordIp = baseResolutionRecord.getValue();
                 preRecordQueryTime = System.currentTimeMillis();
 
@@ -130,6 +132,8 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
                     baseResolutionRecord.setValue(nowOutSideIp);
                     dnsServer.updateResolutionRecord(targetRecords.get(0));
                     log.info("[DDNS_RUNNER] UPDATE_RECORD. type:{}, domain:【{}】, fromIP:{}, toIP:{}", ddnsConfigDO.getDnsServerType(), ddnsConfigDO.generateUniqueKey(), preRecordIp, nowOutSideIp);
+                }else {
+                    log.info("[DDNS_RUNNER] NOT_UPDATE_RECORD. type:{}, domain:【{}】, fromIP:{}, toIP:{}", ddnsConfigDO.getDnsServerType(), ddnsConfigDO.generateUniqueKey(), preRecordIp, nowOutSideIp);
                 }
             } catch (Exception e) {
                 // 运行中发现异常，异常信息
