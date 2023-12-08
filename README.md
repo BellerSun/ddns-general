@@ -1,60 +1,65 @@
 ## ddns-general
-通用的ddns服务器代码，使用H2在本地存储你的DNS解析服务商配置。
+General ddns server code that locally stores configurations for your DNS resolution service providers using H2.
+
+[English](https://github.com/BellerSun/ddns-general/blob/master/README.md) |
+[简体中文](https://github.com/BellerSun/ddns-general/blob/master/README_CN.md)
 ----------
-## 部署:
-Docker镜像部署:[DockerHub](https://hub.docker.com/r/bellersun/ddns-general)
+## Deployment:
+Docker image deployment: [DockerHub](https://hub.docker.com/r/bellersun/ddns-general)
 ```shell
-# 拉镜像，tag需要根据情况自行选择，这里使用测试tag
+# Pull the image, choose the tag according to your needs, using the test tag here
 docker pull bellersun/ddns-general:test-01
-# [3364] 是管理页面端口.
-# [/root/ddns-general/h2] 是存储到本地的配置，如果不挂载出来，重新启动镜像会丢失配置。
-docker run -d -p 3364:3364 -v ~/ddns-general/h2:/root/ddns-general/h2  bellersun/ddns-general:test-01
+# [3364] is the management page port.
+# [/root/ddns-general/h2] is the locally stored configuration; if not mounted, the configuration will be lost when restarting the image.
+docker run -d -p 3364:3364 -v ~/ddns-general/h2:/root/ddns-general/h2 bellersun/ddns-general:test-01
 ```
-Jar部署:
+Jar deployment:
 ```shell
 java -jar ddns-general.jar
 ```
 ----------
-## 链接:
-本地H2数据库地址:[http://localhost:3364/console](http://localhost:3364/console)  账号SA，无密码
+## Links:
+Local H2 database address:[http://localhost:3364/console](http://localhost:3364/console)  Account: SA, no password
 
-本地后台管理页面地址:[http://localhost:3364/html/index](http://localhost:3364/html/index)
+Local backend management page address: [http://localhost:3364/html/index](http://localhost:3364/html/index)
 ----------
-## 更新特性:
-后续会添加更多功能：
-  * 端口、日志目录、配置目录支持环境变量配置
-  * 更多域名解析商支持（如果没有你想要的，可以提Issues）
-  * 页面管理H2中的DNS服务解析商配置（哪位小伙伴可以帮忙做页面~已经搭建[基础页面](http://localhost:3364/html/index)）
+## Update Features:
+More features will be added in the future:
+  * Support for configuring environment variables for port, log directory, and configuration directory
+  * Support for more domain resolution providers (If the one you want is not available, please raise an issue)
+  * age management of DNS service provider configurations in H2 (Looking for someone to help with the page [Basic Page](http://localhost:3364/html/index)）
 
 ----------
-## H2数据库配置项:
-* dns解析服务商类型
-  * TENCENT：腾讯云
-  * ALIYUN：阿里云
-  * HUAWEI：华为云
-* dns解析服务商必须参数,json格式字符串。
-  * 腾讯云：login_token 登陆令牌，在腾讯云官网 [token设置页][tencent_token]生成login_token 
+## H2 Database Configuration Options:
+* DNS resolution service provider type
+  * TENCENT: Tencent Cloud
+  * ALIYUN: Alibaba Cloud
+  * HUAWEI: Huawei Cloud
+* Mandatory parameters for DNS resolution service provider, in JSON format.
+  * Tencent Cloud: `login_token` - Login token, generate on the Tencent Cloud official website [token setting page][tencent_token]
   ```json
   {"login_token": "yourToken"}
   ```
-  * 阿里云：ak访问id，sk访问密匙，在阿里云个人中心 [用户信息管理页][aliyun_token]生成ak、sk
+  * Alibaba Cloud: `ak` - Access key ID, `sk` - Secret access key, generate on the Alibaba Cloud personal center [User Information Management page][aliyun_token]
   ```json
   {"ak": "yourAk","sk": "yourSk"}
   ```
-  * 华为云：ak访问id，sk访问密匙，在华为云个人中心 [我的凭证页][huawei_token]生成ak、sk
+  * Huawei Cloud: `ak` - Access key ID, `sk` - Secret access key, generate on the Huawei Cloud personal center [My Credentials page][huawei_token]
   ```json
   {"ak": "yourAk","sk": "yourSk"}
   ```
-* 主域名:【baidu.com】
-* 解析记录值:【www、wiki、@】
-* 解析记录类型:【A】
-* 查询出来的记录本地的缓存时间。减少调运营商API频次（秒）:【60000】
-* 定时任务Cron字符串:【0 0/1 * * * ? 】
-* 是否激活定时任务:【true】
+* Main Domain: [baidu.com]
+* Resolution Record Values: [www, wiki, @]
+* Resolution Record Type: [A]
+* Local Cache Time for Retrieved Records to Reduce ISP API Calls (seconds): [60000]
+* Scheduled Task Cron String: [0 0/1 * * * ?]
+* Is Scheduled Task Activated: [true]
 
 ----------
-## 依赖项:
-项目中获取物理机外网ip调用的是孙玉朝的ip检测接口[POST:  http://ip.apache.plus](http://ip.apache.plus)
+
+## Dependencies:
+The project retrieves the public IP of the physical machine using the IP detection API by BellerSun [POST: http://ip.apache.plus](http://ip.apache.plus)
+
 
 ----------
 ## License
