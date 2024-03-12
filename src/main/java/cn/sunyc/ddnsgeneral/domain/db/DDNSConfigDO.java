@@ -61,6 +61,7 @@ public class DDNSConfigDO implements Serializable {
     /**
      * 是否启动
      */
+    @Column
     private boolean activate = true;
 
     @Override
