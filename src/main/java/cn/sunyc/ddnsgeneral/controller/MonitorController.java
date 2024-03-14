@@ -1,5 +1,8 @@
 package cn.sunyc.ddnsgeneral.controller;
 
+import cn.sunyc.ddnsgeneral.service.LocalIpService;
+import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,9 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
  * @version: 1.0.0
  */
 @RestController
+@AllArgsConstructor
 @SuppressWarnings("unused")
 @RequestMapping("/api/monitor")
 public class MonitorController {
 
+    private final LocalIpService localIpService;
+
+    @GetMapping({"/ip"})
+    public String queryRunningList() {
+        return localIpService.getLocalOutSideIp();
+    }
 
 }

@@ -20,7 +20,6 @@ public class IPCheckerConfigDO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Id
     @Column(length = 500)
     private String configName;
 

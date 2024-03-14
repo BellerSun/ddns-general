@@ -28,7 +28,7 @@ public class IPCheckerConfigService {
             config = new IPCheckerConfigDO();
             config.setId(-1L);
             config.setConfigName("DEFAULT");
-            config.setUrl("http://ip.apache.plus/");
+            config.setUrl("http://ip.apache.plus");
             config.setMethodType(MethodType.POST);
             config.setRegex("\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b");
             config.setEnable(true);
