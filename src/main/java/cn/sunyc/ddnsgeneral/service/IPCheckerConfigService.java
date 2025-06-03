@@ -66,4 +66,13 @@ public class IPCheckerConfigService {
         }
         return ipCheckerConfigRepository.save(query);
     }
+
+    /**
+     * 根据ID删除配置
+     *
+     * @param id 配置ID
+     */
+    public void deleteById(Long id) {
+        ipCheckerConfigRepository.deleteById(id);
+    }
 }

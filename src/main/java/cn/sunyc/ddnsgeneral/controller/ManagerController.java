@@ -2,10 +2,13 @@ package cn.sunyc.ddnsgeneral.controller;
 
 import cn.sunyc.ddnsgeneral.core.DDNSRunnerManager;
 import cn.sunyc.ddnsgeneral.domain.db.DDNSConfigDO;
+import cn.sunyc.ddnsgeneral.domain.db.IPCheckerConfigDO;
 import cn.sunyc.ddnsgeneral.domain.db.key.DDNSConfigKey;
 import cn.sunyc.ddnsgeneral.service.DDNSConfigService;
+import cn.sunyc.ddnsgeneral.service.IPCheckerConfigService;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -29,18 +32,23 @@ public class ManagerController {
     private DDNSRunnerManager ddnsRunnerManager;
     @Resource
     private DDNSConfigService ddnsConfigService;
+    @Resource
+    private IPCheckerConfigService ipCheckerConfigService;
+
+    // ========== DDNS配置相关接口 ==========
 
     @RequestMapping({"/ddnsConfig/queryRunningList"})
     public List<DDNSConfigDO> queryRunningList() {
         return ddnsRunnerManager.queryRunningList();
     }
 
-
+    /**
+     * <a href="http://localhost:3364/api/manager/ddnsConfig/queryAll">查询所有DDNS配置</a>
+     */
     @RequestMapping({"/ddnsConfig/queryAll"})
     public List<DDNSConfigDO> queryAll() {
         return ddnsConfigService.queryAll();
     }
-
 
     @RequestMapping({"/ddnsConfig/remove"})
     public boolean remove(DDNSConfigKey ddnsConfigKey) {
@@ -52,5 +60,51 @@ public class ManagerController {
     public boolean save(@RequestBody DDNSConfigDO ddnsConfigDO) {
         return ddnsConfigService.saveDDNSConfig(ddnsConfigDO);
     }
+
+    // ========== IP检查器配置相关接口 ==========
+
+    /**
+     * 查询所有IP检查器配置<p>
+     * <a href="http://localhost:3364/api/manager/ipCheckerConfig/queryAll">查询所有IP检查器配置</a>
+     *
+     */
+    @RequestMapping({"/ipCheckerConfig/queryAll"})
+    public List<IPCheckerConfigDO> queryAllIpCheckerConfig() {
+        return ipCheckerConfigService.queryAll();
+    }
+
+    /**
+     * 查询当前启用的IP检查器配置
+     */
+    @RequestMapping({"/ipCheckerConfig/queryEnable"})
+    public IPCheckerConfigDO queryEnableIpCheckerConfig() {
+        return ipCheckerConfigService.queryEnable();
+    }
+
+    /**
+     * 保存IP检查器配置
+     */
+    @RequestMapping({"/ipCheckerConfig/save"})
+    public IPCheckerConfigDO saveIpCheckerConfig(@RequestBody IPCheckerConfigDO ipCheckerConfigDO) {
+        return ipCheckerConfigService.save(ipCheckerConfigDO);
+    }
+
+    /**
+     * 删除IP检查器配置
+     */
+    @RequestMapping({"/ipCheckerConfig/remove"})
+    public boolean removeIpCheckerConfig(@RequestParam Long id) {
+        ipCheckerConfigService.deleteById(id);
+        return true;
+    }
+
+    /**
+     * 启用指定的IP检查器配置
+     */
+    @RequestMapping({"/ipCheckerConfig/enable"})
+    public boolean enableIpCheckerConfig(@RequestParam Long id) {
+        return ipCheckerConfigService.enableById(id);
+    }
+
 
 }
