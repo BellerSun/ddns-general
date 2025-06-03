@@ -120,6 +120,18 @@
             <artifactId>huaweicloud-sdk-dns</artifactId>
             <version>3.1.22</version>
         </dependency>
+
+        <!--腾讯云dns解析sdk使用-->
+        <dependency>
+            <groupId>com.tencentcloudapi</groupId>
+            <artifactId>tencentcloud-sdk-java-common</artifactId>
+            <version>3.1.1266</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tencentcloudapi</groupId>
+            <artifactId>tencentcloud-sdk-java-dnspod</artifactId>
+            <version>3.1.1266</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

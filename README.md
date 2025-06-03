@@ -36,9 +36,9 @@ More features will be added in the future:
   * ALIYUN: Alibaba Cloud
   * HUAWEI: Huawei Cloud
 * Mandatory parameters for DNS resolution service provider, in JSON format.
-  * Tencent Cloud: `login_token` - Login token, generate on the Tencent Cloud official website [token setting page][tencent_token]
+  * Tencent Cloud: `ak` - Access key ID, `sk` - Secret access key, generate on the Tencent Cloud personal center [Access Management page][tencent_token]
   ```json
-  {"login_token": "yourToken"}
+  {"ak": "yourSecretId","sk": "yourSecretKey"}
   ```
   * Alibaba Cloud: `ak` - Access key ID, `sk` - Secret access key, generate on the Alibaba Cloud personal center [User Information Management page][aliyun_token]
   ```json
@@ -65,6 +65,6 @@ The project retrieves the public IP of the physical machine using the IP detecti
 ## License
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html) Copyright (C) Apache Software Foundation
 
-[tencent_token]: https://console.dnspod.cn/account/token
+[tencent_token]: https://console.cloud.tencent.com/cam/capi
 [aliyun_token]: https://usercenter.console.aliyun.com/?spm=api-workbench.API%20Explorer.0.0.113b1e0fG0CkQG#/manage/ak
 [huawei_token]: https://console.huaweicloud.com/iam/?region=cn-north-4&locale=zh-cn#/mine/accessKey

@@ -67,7 +67,8 @@ public class NoneContextTests {
 
     @Test
     void testTencentServer() throws Exception {
-        String token = "";
+        String ak = "";
+        String sk = "";
         String domainName = "sunasan.cn";
         String subDomainName = "www";
         String type = "A";
@@ -75,7 +76,8 @@ public class NoneContextTests {
 
         IDNSServer<BaseResolutionRecord> idnsServer = new TencentDNSServer();
         JSONObject initializeParam = new JSONObject();
-        initializeParam.put("login_token", token);
+        initializeParam.put("ak", ak);
+        initializeParam.put("sk", sk);
         idnsServer.init(initializeParam);
 
         List<BaseResolutionRecord> baseResolutionRecords = idnsServer.queryList(domainName);
@@ -229,6 +231,15 @@ public class NoneContextTests {
         ValidateUtil.validate(args);
         ValidateUtil.valid(args);
 
+        // 通过
+        args = new InitArgsTencent("a", "b", null);
+        ValidateUtil.validate(args);
+        ValidateUtil.valid(args);
+
+        // 通过
+        args = new InitArgsTencent("a", "b", "ap-shanghai");
+        ValidateUtil.validate(args);
+        ValidateUtil.valid(args);
 
         /* 不通过
         //args = new InitArgsToken();

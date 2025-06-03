@@ -36,9 +36,9 @@ java -jar ddns-general.jar
   * ALIYUN：阿里云
   * HUAWEI：华为云
 * dns解析服务商必须参数,json格式字符串。
-  * 腾讯云：login_token 登陆令牌，在腾讯云官网 [token设置页][tencent_token]生成login_token 
+  * 腾讯云：ak访问id，sk访问密匙，在腾讯云个人中心 [访问管理页][tencent_token]生成SecretId(ak)、SecretKey(sk)
   ```json
-  {"login_token": "yourToken"}
+  {"ak": "yourSecretId","sk": "yourSecretKey"}
   ```
   * 阿里云：ak访问id，sk访问密匙，在阿里云个人中心 [用户信息管理页][aliyun_token]生成ak、sk
   ```json
@@ -63,6 +63,6 @@ java -jar ddns-general.jar
 ## License
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html) Copyright (C) Apache Software Foundation
 
-[tencent_token]: https://console.dnspod.cn/account/token
+[tencent_token]: https://console.cloud.tencent.com/cam/capi
 [aliyun_token]: https://usercenter.console.aliyun.com/?spm=api-workbench.API%20Explorer.0.0.113b1e0fG0CkQG#/manage/ak
 [huawei_token]: https://console.huaweicloud.com/iam/?region=cn-north-4&locale=zh-cn#/mine/accessKey
