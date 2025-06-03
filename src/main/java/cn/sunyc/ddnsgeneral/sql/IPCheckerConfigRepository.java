@@ -9,4 +9,7 @@ import org.springframework.stereotype.Component;
 public interface IPCheckerConfigRepository extends JpaRepository<IPCheckerConfigDO, Long> {
     @Query(value = "SELECT * FROM IP_CHECKER_CONFIG WHERE enable = true LIMIT 1", nativeQuery = true)
     IPCheckerConfigDO findFirstByEnableTrue();
+
+    @Query(value = "SELECT * FROM IP_CHECKER_CONFIG ORDER BY id DESC LIMIT 1", nativeQuery = true)
+    IPCheckerConfigDO queryLastByIdDesc();
 }

@@ -70,7 +70,7 @@ public class DDNSRunnerManager implements ApplicationContextAware {
         log.info("[DDNS_RUNNER_MANAGER] refresh ddns runner. before:{}, after:{}", JSON.toJSONString(ddnsRunner.getDdnsConfigDO()), JSON.toJSONString(ddnsConfigDO));
         try {
             ddnsRunner.init(ddnsConfigDO);
-            log.info("[DDNS_RUNNER_MANAGER] refresh ddns runner. success.");
+            log.info("[DDNS_RUNNER_MANAGER] refresh ddns runner. success. ");
         } catch (Exception e) {
             log.error("[DDNS_RUNNER_MANAGER] init fail. ddnsProperties:{}", JSON.toJSONString(ddnsConfigDO), e);
         }

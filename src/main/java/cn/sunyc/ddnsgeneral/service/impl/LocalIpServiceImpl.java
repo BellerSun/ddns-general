@@ -14,6 +14,7 @@ import org.springframework.util.Assert;
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,18 +34,25 @@ public class LocalIpServiceImpl implements LocalIpService {
     /**
      * 带缓存的获取本地的外网ip地址
      */
+    @Override
     public String getLocalOutSideIp() {
         final Long cacheTime = globalConfigService.queryConfig(GlobalConfigKey.LOCAL_IP_CACHE_SECONDS, Long.class, 10L);
         final IPCheckerConfigDO ipCheckerConfig = ipCheckerConfigService.queryEnable();
         final Long id = ipCheckerConfig.getId();
-        final String url = ipCheckerConfig.getUrl();
-        final MethodType methodType = ipCheckerConfig.getMethodType();
-        final String regex = ipCheckerConfig.getRegex();
-
         // 要是缓存有，并且没过期，直接返回
         if (idResultCache.containsKey(id) && (System.currentTimeMillis() - idResultCache.get(id).getSecond()) < (cacheTime * 1000)) {
             return idResultCache.get(id).getFirst();
         }
+
+        return getLocalOutSideIp(ipCheckerConfig);
+    }
+
+    @Override
+    public String getLocalOutSideIp(IPCheckerConfigDO ipCheckerConfig) {
+        final Long id = Optional.ofNullable(ipCheckerConfig.getId()).orElse(-2L);
+        final String url = ipCheckerConfig.getUrl();
+        final MethodType methodType = ipCheckerConfig.getMethodType();
+        final String regex = ipCheckerConfig.getRegex();
 
         final String resp = this.queryHttpResult(url, methodType);
         Assert.notNull(resp, "[IP_SERVICE] queryHttpResult error, url:" + url);
@@ -57,7 +65,7 @@ public class LocalIpServiceImpl implements LocalIpService {
             idResultCache.put(id, Pair.of(ip, System.currentTimeMillis()));
             return ip;
         }
-        throw new RuntimeException("[IP_SERVICE] No IP found in the regex:" + regex + ",\tresp:" + resp);
+        throw new RuntimeException("[IP_SERVICE] No IP found in the regex:【" + regex + "】,\tresp:【" + resp + "】");
     }
 
     private String queryHttpResult(String url, MethodType methodType) {
@@ -71,4 +79,5 @@ public class LocalIpServiceImpl implements LocalIpService {
             throw new RuntimeException("[IP_SERVICE] getLocalOutSideIp error, url:" + url, e);
         }
     }
+
 }

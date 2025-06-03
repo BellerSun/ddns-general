@@ -6,6 +6,7 @@ import cn.sunyc.ddnsgeneral.domain.db.IPCheckerConfigDO;
 import cn.sunyc.ddnsgeneral.domain.db.key.DDNSConfigKey;
 import cn.sunyc.ddnsgeneral.service.DDNSConfigService;
 import cn.sunyc.ddnsgeneral.service.IPCheckerConfigService;
+import cn.sunyc.ddnsgeneral.service.LocalIpService;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +35,8 @@ public class ManagerController {
     private DDNSConfigService ddnsConfigService;
     @Resource
     private IPCheckerConfigService ipCheckerConfigService;
+    @Resource
+    private LocalIpService localIpService;
 
     // ========== DDNS配置相关接口 ==========
 
@@ -66,7 +69,6 @@ public class ManagerController {
     /**
      * 查询所有IP检查器配置<p>
      * <a href="http://localhost:3364/api/manager/ipCheckerConfig/queryAll">查询所有IP检查器配置</a>
-     *
      */
     @RequestMapping({"/ipCheckerConfig/queryAll"})
     public List<IPCheckerConfigDO> queryAllIpCheckerConfig() {
@@ -107,4 +109,15 @@ public class ManagerController {
     }
 
 
+    /**
+     * 测试IP检查器配置<p>
+     */
+    @RequestMapping({"/ipCheckerConfig/test"})
+    public String testIpCheckerConfig(@RequestBody IPCheckerConfigDO ipCheckerConfigDO) {
+        try {
+            return localIpService.getLocalOutSideIp(ipCheckerConfigDO);
+        } catch (RuntimeException e) {
+            return e.getMessage();
+        }
+    }
 }

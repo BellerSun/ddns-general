@@ -1,6 +1,7 @@
 package cn.sunyc.ddnsgeneral.domain.db;
 
 import com.aliyun.credentials.http.MethodType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,11 +14,12 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "IP_CHECKER_CONFIG")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class IPCheckerConfigDO {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(length = 500)
