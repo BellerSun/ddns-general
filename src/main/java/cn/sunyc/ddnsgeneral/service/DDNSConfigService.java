@@ -40,4 +40,8 @@ public class DDNSConfigService {
         ddnsConfigRepository.deleteById(ddnsConfigKey);
         ddnsRunnerManager.removeDDNSRunner(ddnsConfigKey);
     }
+
+    public void runNow(DDNSConfigKey ddnsConfigKey) {
+        ddnsRunnerManager.runNow(ddnsConfigKey);
+    }
 }

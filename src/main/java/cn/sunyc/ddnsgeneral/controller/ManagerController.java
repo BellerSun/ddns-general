@@ -64,6 +64,12 @@ public class ManagerController {
         return ddnsConfigService.saveDDNSConfig(ddnsConfigDO);
     }
 
+    @RequestMapping({"/ddnsConfig/runNow"})
+    public boolean runNow(DDNSConfigKey ddnsConfigKey) {
+        ddnsConfigService.runNow(ddnsConfigKey);
+        return true;
+    }
+
     // ========== IP检查器配置相关接口 ==========
 
     /**

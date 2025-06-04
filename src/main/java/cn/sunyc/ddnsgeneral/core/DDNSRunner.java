@@ -9,6 +9,7 @@ import cn.sunyc.ddnsgeneral.service.LocalIpService;
 import cn.sunyc.ddnsgeneral.utils.MDCUtil;
 import com.alibaba.fastjson.JSON;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -83,7 +84,15 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
         }
     }
 
+    @NoArgsConstructor
     private final class DoDDNSRunnable implements Runnable {
+
+        private boolean runForce = false;
+
+        public DoDDNSRunnable(boolean runForce) {
+            this.runForce = runForce;
+        }
+
         /**
          * 上次解析出来的ip
          */
@@ -96,7 +105,7 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
         public void run() {
             MDCUtil.setRequestId(UUID.randomUUID() + SystemConstant.COMMON_STR_SPLIT + ("【" + ddnsConfigDO.generateUniqueKey() + "】"));
             log.info("[DDNS_RUNNER] start. DDNSProperties:{}", ddnsConfigDO.toString());
-            if (!ddnsConfigDO.isActivate()) {
+            if (!runForce && !ddnsConfigDO.isActivate()) {
                 log.info("[DDNS_RUNNER] end. not active");
                 return;
             }
@@ -141,6 +150,15 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
             }
             log.info("[DDNS_RUNNER] standard end.");
         }
+    }
+
+    /**
+     * 立即执行一次 
+     */
+    public void runNow() {
+        log.info("[DDNS_RUNNER] runNow start.");
+        new DoDDNSRunnable(true).run();
+        log.info("[DDNS_RUNNER] runNow end.");
     }
 
 

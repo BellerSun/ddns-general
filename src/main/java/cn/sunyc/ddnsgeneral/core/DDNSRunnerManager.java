@@ -98,4 +98,15 @@ public class DDNSRunnerManager implements ApplicationContextAware {
         return runnerCacheMap.values().stream().map(DDNSRunner::getDdnsConfigDO).collect(Collectors.toList());
     }
 
+
+    public void runNow(DDNSConfigKey ddnsConfigKey) {
+        final String uniqueKey = ddnsConfigKey.generateUniqueKey();
+        final DDNSRunner<?> ddnsRunner = runnerCacheMap.get(uniqueKey);
+        if (null == ddnsRunner) {
+            log.error("[DDNS_RUNNER_MANAGER] runNow fail. ddns runner not found. uniqueKey:{}", uniqueKey);
+            throw new RuntimeException("ddns runner not found. uniqueKey:" + uniqueKey);
+        }
+        ddnsRunner.runNow();
+    }
+
 }
