@@ -9,6 +9,7 @@ services:
     volumes:
       - /root/ddns-general/gclogs:/root/logs
       - /root/ddns-general/logs:/root/ddns-general/logs
+      - /root/ddns-general/h2:/root/ddns-general/h2
     env_file:
       - .env  # 引用 .env 文件，容器将自动加载环境变量
     restart: unless-stopped  # 配置容器崩溃后自动重启

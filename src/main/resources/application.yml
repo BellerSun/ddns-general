@@ -1,13 +1,11 @@
 server:
   # 为啥是3364呢？因为九键键盘的DDNS就是3364
   port: 3364
-logging:
-  config: classpath:log.xml
+
 
 spring:
   datasource:
     url: jdbc:h2:file:~/ddns-general/h2/db
-    platform: h2
     username: sa
     password:
     driverClassName: org.h2.Driver
@@ -29,3 +27,6 @@ spring:
         web-allow-others: false
   profiles:
     active: production
+  sql:
+    init:
+      platform: h2
