@@ -5,7 +5,7 @@ services:
     image: apache.plus:1612/ddns-general:latest
     container_name: ddns-general
     ports:
-      - "9994:7001"  # 映射端口，假设容器内的应用监听 77001 端口
+      - "3364:3364"  # 映射端口，假设容器内的应用监听 77001 端口
     volumes:
       - /root/ddns-general/gclogs:/root/logs
       - /root/ddns-general/logs:/root/ddns-general/logs
