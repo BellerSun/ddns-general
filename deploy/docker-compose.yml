@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  ddns-general:
+    image: apache.plus:1612/ddns-general:latest
+    container_name: ddns-general
+    ports:
+      - "9994:7001"  # 映射端口，假设容器内的应用监听 77001 端口
+    volumes:
+      - /root/ddns-general/gclogs:/root/logs
+      - /root/ddns-general/logs:/root/ddns-general/logs
+    env_file:
+      - .env  # 引用 .env 文件，容器将自动加载环境变量
+    restart: unless-stopped  # 配置容器崩溃后自动重启
