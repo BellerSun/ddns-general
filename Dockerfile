@@ -1,4 +1,4 @@
-FROM openjdk:8u181-jdk
+FROM apache.plus:1612/amazoncorretto:21.0.5-al2023
 
 ENV APP_NAME ddns-general
 
