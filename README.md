@@ -21,7 +21,10 @@ java -jar ddns-general.jar
 ## Links:
 Local H2 database address:[http://localhost:3364/console](http://localhost:3364/console)  Account: SA, no password
 
-Local backend management page address: [http://localhost:3364/html/index](http://localhost:3364/html/index)
+Local backend management page address: [http://localhost:3364](http://localhost:3364)    
+
+![image](https://github.com/user-attachments/assets/efb9c3ad-db33-4b86-a00b-3146441b5095)
+
 ----------
 ## Update Features:
 More features will be added in the future:
@@ -31,6 +34,7 @@ More features will be added in the future:
 
 ----------
 ## H2 Database Configuration Options:
+
 * DNS resolution service provider type
   * TENCENT: Tencent Cloud
   * ALIYUN: Alibaba Cloud
@@ -54,6 +58,7 @@ More features will be added in the future:
 * Local Cache Time for Retrieved Records to Reduce ISP API Calls (seconds): [60000]
 * Scheduled Task Cron String: [0 0/1 * * * ?]
 * Is Scheduled Task Activated: [true]
+![image](https://github.com/user-attachments/assets/196e908b-ad37-405d-afef-8fdeab759790)
 
 ----------
 
