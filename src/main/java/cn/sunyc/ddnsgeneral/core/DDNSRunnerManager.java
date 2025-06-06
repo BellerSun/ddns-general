@@ -66,7 +66,7 @@ public class DDNSRunnerManager implements ApplicationContextAware {
     public void refreshDDNSRunner(DDNSConfigDO ddnsConfigDO) {
         final String uniqueKey = ddnsConfigDO.generateUniqueKey();
         log.info("[DDNS_RUNNER_MANAGER] refresh ddns runner. uniqueKey:{}", uniqueKey);
-        final DDNSRunner<?> ddnsRunner = runnerCacheMap.getOrDefault(uniqueKey, new DDNSRunner<>(this.applicationContext, localIpService));
+        final DDNSRunner<?> ddnsRunner = runnerCacheMap.getOrDefault(uniqueKey, new DDNSRunner<>(this.applicationContext, localIpService, ddnsConfigRepository));
         log.info("[DDNS_RUNNER_MANAGER] refresh ddns runner. before:{}, after:{}", JSON.toJSONString(ddnsRunner.getDdnsConfigDO()), JSON.toJSONString(ddnsConfigDO));
         try {
             ddnsRunner.init(ddnsConfigDO);

@@ -44,7 +44,7 @@ public class DDNSConfigDO implements Serializable {
     /**
      * 查询出来的解析记录，生存时间。避免每次都去查，过了这个时间长度就不相信该结果了
      */
-    private long ddnsRecordAliveTime;
+    private Long ddnsRecordAliveTime;
 
     /**
      * 记录类型
@@ -63,6 +63,17 @@ public class DDNSConfigDO implements Serializable {
      */
     @Column
     private boolean activate = true;
+
+    /**
+     * 上次查询ip的时间戳
+     */
+    @Column
+    private Long lastQueryTime;
+    /**
+     * 上次更新的IP地址
+     */
+    @Column
+    private String lastIp;
 
     @Override
     public String toString() {
