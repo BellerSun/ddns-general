@@ -22,6 +22,7 @@ java -jar ddns-general.jar
 本地H2数据库地址:[http://localhost:3364/console](http://localhost:3364/console)  账号SA，无密码
 
 本地后台管理页面地址:[http://localhost:3364/html/index](http://localhost:3364/html/index)
+![image](https://github.com/user-attachments/assets/efb9c3ad-db33-4b86-a00b-3146441b5095)
 ----------
 ## 更新特性:
 后续会添加更多功能：
@@ -54,6 +55,7 @@ java -jar ddns-general.jar
 * 查询出来的记录本地的缓存时间。减少调运营商API频次（秒）:【60000】
 * 定时任务Cron字符串:【0 0/1 * * * ? 】
 * 是否激活定时任务:【true】
+  ![image](https://github.com/user-attachments/assets/196e908b-ad37-405d-afef-8fdeab759790)
 
 ----------
 ## 依赖项:
