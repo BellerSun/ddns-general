@@ -1,4 +1,4 @@
-FROM apache.plus:1612/amazoncorretto:21.0.5-al2023
+FROM crpi-ck18iqvocpe61kfd.cn-beijing.personal.cr.aliyuncs.com/truthx/amazoncorretto:21.0.5-al2023
 
 ENV APP_NAME ddns-general
 

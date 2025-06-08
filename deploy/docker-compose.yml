@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   ddns-general:
-    image: apache.plus:1612/ddns-general:latest
+    image: crpi-ck18iqvocpe61kfd.cn-beijing.personal.cr.aliyuncs.com/truthx/ddns-general:latest
     container_name: ddns-general
     ports:
       - "3364:3364"  # 映射端口，假设容器内的应用监听 77001 端口
