@@ -3,17 +3,26 @@ package cn.sunyc.ddnsgeneral.controller;
 import cn.sunyc.ddnsgeneral.core.DDNSRunnerManager;
 import cn.sunyc.ddnsgeneral.domain.db.DDNSConfigDO;
 import cn.sunyc.ddnsgeneral.domain.db.IPCheckerConfigDO;
+import cn.sunyc.ddnsgeneral.domain.db.MsgNotifierConfigDO;
 import cn.sunyc.ddnsgeneral.domain.db.key.DDNSConfigKey;
+import cn.sunyc.ddnsgeneral.domain.dto.MsgNotifierTypeDTO;
+import cn.sunyc.ddnsgeneral.domain.dto.MsgTypeDTO;
+import cn.sunyc.ddnsgeneral.enumeration.MsgNotifierType;
+import cn.sunyc.ddnsgeneral.enumeration.MsgType;
 import cn.sunyc.ddnsgeneral.service.DDNSConfigService;
 import cn.sunyc.ddnsgeneral.service.IPCheckerConfigService;
 import cn.sunyc.ddnsgeneral.service.LocalIpService;
+import cn.sunyc.ddnsgeneral.service.MsgNotifierConfigService;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 管理系统的控制器
@@ -37,6 +46,8 @@ public class ManagerController {
     private IPCheckerConfigService ipCheckerConfigService;
     @Resource
     private LocalIpService localIpService;
+    @Resource
+    private MsgNotifierConfigService msgNotifierConfigService;
 
     // ========== DDNS配置相关接口 ==========
 
@@ -125,5 +136,80 @@ public class ManagerController {
         } catch (RuntimeException e) {
             return e.getMessage();
         }
+    }
+
+    // ========== 消息通知配置相关接口 ==========
+
+    /**
+     * 查询所有消息通知配置<p>
+     * <a href="http://localhost:3364/api/manager/msgNotifierConfig/queryAll">查询所有消息通知配置</a>
+     */
+    @RequestMapping({"/msgNotifierConfig/queryAll"})
+    public List<MsgNotifierConfigDO> queryAllMsgNotifierConfig() {
+        return msgNotifierConfigService.queryAll();
+    }
+
+    /**
+     * 保存消息通知配置
+     */
+    @RequestMapping({"/msgNotifierConfig/save"})
+    public MsgNotifierConfigDO saveMsgNotifierConfig(@RequestBody MsgNotifierConfigDO msgNotifierConfigDO) {
+        return msgNotifierConfigService.save(msgNotifierConfigDO);
+    }
+
+    /**
+     * 删除消息通知配置
+     */
+    @RequestMapping({"/msgNotifierConfig/remove"})
+    public boolean removeMsgNotifierConfig(@RequestParam Long id) {
+        msgNotifierConfigService.deleteById(id);
+        return true;
+    }
+
+    /**
+     * 启用/禁用消息通知配置
+     */
+    @RequestMapping({"/msgNotifierConfig/toggleEnable"})
+    public MsgNotifierConfigDO toggleEnableMsgNotifierConfig(@RequestParam Long id, @RequestParam Boolean enable) {
+        return msgNotifierConfigService.toggleEnable(id, enable);
+    }
+
+    /**
+     * 发送测试消息
+     */
+    @RequestMapping({"/msgNotifierConfig/sendMsg"})
+    public boolean sendMsg(@RequestBody MsgNotifierConfigDO msgNotifierConfigDO) {
+        return msgNotifierConfigService.sendMsg(msgNotifierConfigDO);
+    }
+
+    /**
+     * 获取消息通知类型枚举列表<p>
+     * <a href="http://localhost:3364/api/manager/msgNotifierConfig/getNotifierTypes">获取消息通知类型枚举列表</a>
+     */
+    @RequestMapping({"/msgNotifierConfig/getNotifierTypes"})
+    public List<MsgNotifierTypeDTO> getNotifierTypes() {
+        return Arrays.stream(MsgNotifierType.values())
+                .map(type -> new MsgNotifierTypeDTO(
+                        type.name(),
+                        type.getName(),
+                        type.getHookDesc()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 获取消息类型枚举列表<p>
+     * <a href="http://localhost:3364/api/manager/msgNotifierConfig/getMsgTypes">获取消息类型枚举列表</a>
+     */
+    @RequestMapping({"/msgNotifierConfig/getMsgTypes"})
+    public List<MsgTypeDTO> getMsgTypes() {
+        return Arrays.stream(MsgType.values())
+                .map(type -> new MsgTypeDTO(
+                        type.name(),
+                        type.getName(),
+                        type.getDesc(),
+                        type.getParams()
+                ))
+                .collect(Collectors.toList());
     }
 }
