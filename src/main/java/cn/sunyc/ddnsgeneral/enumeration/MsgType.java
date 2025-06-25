@@ -13,8 +13,8 @@ public enum MsgType {
             "timeStr", "更新时间的字符串，格式为yyyy-MM-dd HH:mm:ss",
             "domain", "主域名",
             "subDomain", "子域名",
-            "ip_old", "旧IP地址",
-            "ip_new", "新IP地址"
+            "ipOld", "旧IP地址",
+            "ipNew", "新IP地址"
     )),
     ERROR("运行错误", "当任务发生错误时候会发送该提醒消息"
             , Map.of(

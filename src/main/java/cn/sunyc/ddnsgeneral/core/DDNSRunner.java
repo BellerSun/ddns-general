@@ -5,10 +5,13 @@ import cn.sunyc.ddnsgeneral.domain.SystemConstant;
 import cn.sunyc.ddnsgeneral.domain.db.DDNSConfigDO;
 import cn.sunyc.ddnsgeneral.domain.resolution.BaseResolutionRecord;
 import cn.sunyc.ddnsgeneral.enumeration.DNSServerType;
+import cn.sunyc.ddnsgeneral.enumeration.MsgType;
 import cn.sunyc.ddnsgeneral.service.LocalIpService;
+import cn.sunyc.ddnsgeneral.service.MsgNotifierConfigService;
 import cn.sunyc.ddnsgeneral.sql.DDNSConfigRepository;
 import cn.sunyc.ddnsgeneral.utils.MDCUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +21,8 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.util.Assert;
 
 import java.io.Closeable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -31,6 +36,7 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
     private final ApplicationContext applicationContext;
     private final LocalIpService localIpService;
     private final DDNSConfigRepository ddnsConfigRepository;
+    private final MsgNotifierConfigService msgNotifierConfigService;
 
     @Getter
     private DDNSConfigDO ddnsConfigDO;
@@ -38,10 +44,14 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
 
     private ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
-    public DDNSRunner(ApplicationContext applicationContext, LocalIpService localIpService, DDNSConfigRepository ddnsConfigRepository) {
+    public DDNSRunner(ApplicationContext applicationContext
+            , LocalIpService localIpService
+            , DDNSConfigRepository ddnsConfigRepository
+            , MsgNotifierConfigService msgNotifierConfigService) {
         this.applicationContext = applicationContext;
         this.localIpService = localIpService;
         this.ddnsConfigRepository = ddnsConfigRepository;
+        this.msgNotifierConfigService = msgNotifierConfigService;
     }
 
     @SuppressWarnings("unchecked")
@@ -52,7 +62,9 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
         close();
         Class<? extends IDNSServer<T>> dnsServerTypeByName = (Class<? extends IDNSServer<T>>) DNSServerType.getDNSServerTypeByName(ddnsConfigDO.getDnsServerType());
         if (null == dnsServerTypeByName) {
-            throw new IllegalArgumentException("ddns server type config error, support ddns server type :" + DNSServerType.getValidNames());
+            String errorMsg = "ddns server type config error, support ddns server type :" + DNSServerType.getValidNames();
+            this.notifyErrorMsg(errorMsg);
+            throw new IllegalArgumentException(errorMsg);
         }
 
         try {
@@ -60,7 +72,9 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
             this.dnsServer = applicationContext.getBean(dnsServerTypeByName);
             log.info("[DDNS_RUNNER] getBeanFinished. type:{}, instance:{}", dnsServerTypeByName.getSimpleName(), dnsServer);
         } catch (Exception ignore) {
-            throw new IllegalArgumentException("ddns server bean get error, dis server type:" + dnsServerTypeByName + ", support ddns server type:" + DNSServerType.getValidNames());
+            String errorMsg = "ddns server bean get error, dis server type:" + dnsServerTypeByName + ", support ddns server type:" + DNSServerType.getValidNames(); 
+            this.notifyErrorMsg(errorMsg);
+            throw new IllegalArgumentException(errorMsg);
         }
         log.info("[DDNS_RUNNER] init ddns server start.");
         this.dnsServer.init(JSON.parseObject(ddnsConfigDO.getDnsServerParam()));
@@ -82,6 +96,7 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
                 log.info("[DDNS_RUNNER] shutdown old threadPoolTaskScheduler.");
                 this.threadPoolTaskScheduler.shutdown();
             } catch (Exception e) {
+                this.notifyErrorMsg("[DDNS_RUNNER] shutdown threadPoolTaskScheduler error. " + e.getMessage());
                 log.error("[DDNS_RUNNER] shutdown threadPoolTaskScheduler error.", e);
             }
         }
@@ -116,6 +131,7 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
                 this.runDDNS();
             } catch (Exception e) {
                 // 运行中发现异常，异常信息
+                DDNSRunner.this.notifyErrorMsg("[DDNS_RUNNER] error. " + e.getMessage());
                 log.error("[DDNS_RUNNER] error.", e);
             }
             log.info("[DDNS_RUNNER] standard end.");
@@ -155,6 +171,7 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
                 // 这里发现不相等，不会刷新上次查询时间、结果。因为正好下次循环就重新查一下，这里修改成功了没。
                 baseResolutionRecord.setValue(nowOutSideIp);
                 dnsServer.updateResolutionRecord(targetRecords.get(0));
+                DDNSRunner.this.notifyUpdate(ddnsConfigDO.getDdnsConfigKey().getDomainName(), ddnsConfigDO.getDdnsConfigKey().getDomainSubName(), preRecordIp, nowOutSideIp);
                 log.info("[DDNS_RUNNER] UPDATE_RECORD. type:{}, domain:【{}】, fromIP:{}, toIP:{}", ddnsConfigDO.getDnsServerType(), ddnsConfigDO.generateUniqueKey(), preRecordIp, nowOutSideIp);
             }else {
                 log.info("[DDNS_RUNNER] NOT_UPDATE_RECORD. type:{}, domain:【{}】, fromIP:{}, toIP:{}", ddnsConfigDO.getDnsServerType(), ddnsConfigDO.generateUniqueKey(), preRecordIp, nowOutSideIp);
@@ -182,5 +199,21 @@ public class DDNSRunner<T extends BaseResolutionRecord> implements Closeable {
         log.info("[DDNS_RUNNER] runNow end.");
     }
 
+    private void notifyErrorMsg(String msg) {   
+        JSONObject param = new JSONObject();
+        param.fluentPut("timeStr", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        param.fluentPut("msg", msg);
+        msgNotifierConfigService.sendMsg(MsgType.ERROR, param);
+    }
+
+    private void notifyUpdate(String domain, String subDomain, String ipOld, String ipNew) {
+        JSONObject param = new JSONObject();
+        param.fluentPut("timeStr", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        param.fluentPut("domain", domain);
+        param.fluentPut("subDomain", subDomain);
+        param.fluentPut("ipOld", ipOld);
+        param.fluentPut("ipNew", ipNew);
+        msgNotifierConfigService.sendMsg(MsgType.DDNS_UPDATE, param);
+    }
 
 }
