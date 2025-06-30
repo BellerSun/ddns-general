@@ -69,15 +69,34 @@ public class LocalIpServiceImpl implements LocalIpService {
     }
 
     private String queryHttpResult(String url, MethodType methodType) {
-        try {
-            if (methodType == MethodType.GET) {
-                return HttpUtil.get(url, new HashMap<>());
-            } else {
-                return HttpUtil.post(url, new HashMap<>());
+        int maxRetries = 5;
+        int retryInterval = 2000; // 2秒
+        
+        for (int i = 0; i < maxRetries; i++) {
+            try {
+                if (methodType == MethodType.GET) {
+                    return HttpUtil.get(url, new HashMap<>());
+                } else {
+                    return HttpUtil.post(url, new HashMap<>());
+                }
+            } catch (Exception e) {
+                if (i == maxRetries - 1) {
+                    // 最后一次重试失败，抛出异常
+                    throw new RuntimeException("[IP_SERVICE] getLocalOutSideIp error after " + maxRetries + " retries, url:" + url, e);
+                }
+                
+                // 不是最后一次重试，等待后继续
+                try {
+                    Thread.sleep(retryInterval);
+                } catch (InterruptedException interruptedException) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("[IP_SERVICE] Retry interrupted, url:" + url, interruptedException);
+                }
             }
-        } catch (Exception e) {
-            throw new RuntimeException("[IP_SERVICE] getLocalOutSideIp error, url:" + url, e);
         }
+        
+        // 理论上不会执行到这里
+        throw new RuntimeException("[IP_SERVICE] Unexpected error, url:" + url);
     }
 
 }
